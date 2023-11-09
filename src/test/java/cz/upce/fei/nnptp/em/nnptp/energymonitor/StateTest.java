@@ -1,11 +1,6 @@
 package cz.upce.fei.nnptp.em.nnptp.energymonitor;
 
-import cz.upce.fei.nnptp.em.nnptp.energymonitor.entity.ObservedValue;
 import org.junit.jupiter.api.Test;
-
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
