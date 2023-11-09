@@ -18,14 +18,14 @@ public class Meter {
         this.energy = energy;
         this.distribution = distribution;
         this.meterType = meterType;
-        this.obVals = obVals;
+        this.observedValues = obVals;
     }
 
     private Energy energy;
     private Distribution distribution;
     private MeterType meterType;
     
-    private List<ObservedValue> obVals;
+    private List<ObservedValue> observedValues;
 
     public Energy getEnergy() {
         return energy;
@@ -51,18 +51,36 @@ public class Meter {
         this.meterType = meterType;
     }
 
-    public List<ObservedValue> getObVals() {
-        return obVals;
+    public List<ObservedValue> getObservedValues() {
+        return observedValues;
     }
 
-    public void setObVals(List<ObservedValue> obVals) {
-        this.obVals = obVals;
+    public void setObservedValues(List<ObservedValue> observedValues) {
+        this.observedValues = observedValues;
     }
-    
+
+    /**
+     * Calculate consumed electrics by selected MeterType.
+     * @return total consumed power
+     */
     public double calculateConsumedElectricits() {
-        // TODO calculate consumed power from all measurements
-        // according to metertype and observedvalues
-        throw new RuntimeException();
+        if (observedValues == null || observedValues.isEmpty()) {
+            return 0.0;
+        }
+
+        double totalConsumedPower = 0.0;
+
+        if (meterType == MeterType.CumulativeValue) {
+            ObservedValue first = observedValues.get(0);
+            ObservedValue last = observedValues.get(observedValues.size() - 1);
+            totalConsumedPower = last.getValue() - first.getValue();
+        } else if (meterType == MeterType.ActualValue) {
+            for (ObservedValue observedValue : observedValues) {
+                totalConsumedPower += observedValue.getValue();
+            }
+        }
+
+        return totalConsumedPower;
     }
     
     public double calculateConsumedElectricits(LocalDateTime from, LocalDateTime to) {
