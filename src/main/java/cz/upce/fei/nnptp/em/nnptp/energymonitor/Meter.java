@@ -73,7 +73,7 @@ public class Meter {
     public double calculatePrice() {
         double totalConsumedElectricity = calculateConsumedElectricits();
 
-        if (totalConsumedElectricity == 0.0) {
+        if (totalConsumedElectricity == 0.0 || obVals == null) {
             return 0.0;
         }
 
