@@ -8,13 +8,13 @@ import java.util.List;
 public class ConnectionPoint {
 
     private int id;
-    private String addr;
+    private String address;
     
     private List<Meter> meters;
 
-    public ConnectionPoint(int id, String addr, List<Meter> meters) {
+    public ConnectionPoint(int id, String address, List<Meter> meters) {
         this.id = id;
-        this.addr = addr;
+        this.address = address;
         this.meters = meters;
     }
 
@@ -26,12 +26,12 @@ public class ConnectionPoint {
         this.id = id;
     }
 
-    public String getAddr() {
-        return addr;
+    public String getAddress() {
+        return address;
     }
 
-    public void setAddr(String addr) {
-        this.addr = addr;
+    public void setAddress(String address) {
+        this.address = address;
     }
 
     public List<Meter> getMeters() {
