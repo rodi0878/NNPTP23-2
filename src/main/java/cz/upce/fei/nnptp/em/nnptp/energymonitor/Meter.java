@@ -9,11 +9,6 @@ import java.util.List;
  */
 public class Meter {
     
-    public static enum MeterType {
-        CumulativeValue,
-        ActualValue
-    }
-    
     public Meter(Energy energy, Distribution distribution, MeterType meterType, List<ObservedValue> obVals) {
         this.energy = energy;
         this.distribution = distribution;

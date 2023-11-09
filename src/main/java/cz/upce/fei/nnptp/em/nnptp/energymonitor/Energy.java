@@ -4,14 +4,6 @@ package cz.upce.fei.nnptp.em.nnptp.energymonitor;
  *
  */
 public class Energy {
-
-    private static enum EnergyType {
-        Electricity,
-        Gas,
-        ColdWater,
-        HotWater,
-        CentralHeating
-    }
     
     private String name;
 
