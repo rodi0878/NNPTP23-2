@@ -8,12 +8,12 @@ import java.util.List;
  *
  */
 public class Meter {
-    
+
     public static enum MeterType {
         CumulativeValue,
         ActualValue
     }
-    
+
     public Meter(Energy energy, Distribution distribution, MeterType meterType, List<ObservedValue> obVals) {
         this.energy = energy;
         this.distribution = distribution;
@@ -24,7 +24,7 @@ public class Meter {
     private Energy energy;
     private Distribution distribution;
     private MeterType meterType;
-    
+
     private List<ObservedValue> obVals;
 
     public Energy getEnergy() {
@@ -58,28 +58,36 @@ public class Meter {
     public void setObVals(List<ObservedValue> obVals) {
         this.obVals = obVals;
     }
-    
+
     public double calculateConsumedElectricits() {
         // TODO calculate consumed power from all measurements
         // according to metertype and observedvalues
         throw new RuntimeException();
     }
-    
+
     public double calculateConsumedElectricits(LocalDateTime from, LocalDateTime to) {
-                // TODO calculate consumed power from selected measurements
+        // TODO calculate consumed power from selected measurements
         throw new RuntimeException();
     }
-    
+
     public double calculatePrice() {
-        // TODO ...
-        throw new  RuntimeException();
+        double totalConsumedElectricity = calculateConsumedElectricits();
+
+        if (totalConsumedElectricity == 0.0) {
+            return 0.0;
+        }
+
+        double pricePerMeasuredUnit = energy.getPricePerMeasuredUnit();
+        
+        double totalPrice = totalConsumedElectricity * pricePerMeasuredUnit;
+
+        return totalPrice;
     }
-    
+
     public double calculatePrice(LocalDateTime from, LocalDateTime to) {
         // TODO
         throw new RuntimeException();
-        
+
     }
 
-    
 }
