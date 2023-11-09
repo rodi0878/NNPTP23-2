@@ -1,7 +1,6 @@
 package cz.upce.fei.nnptp.em.nnptp.energymonitor;
 
 import org.junit.jupiter.api.Test;
-
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
