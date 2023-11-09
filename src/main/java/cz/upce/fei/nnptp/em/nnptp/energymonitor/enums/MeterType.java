@@ -1,4 +1,4 @@
-package cz.upce.fei.nnptp.em.nnptp.energymonitor;
+package cz.upce.fei.nnptp.em.nnptp.energymonitor.enums;
 
 public enum MeterType {
     CUMULATIVE_VALUE,

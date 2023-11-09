@@ -1,5 +1,7 @@
 package cz.upce.fei.nnptp.em.nnptp.energymonitor;
 
+import cz.upce.fei.nnptp.em.nnptp.energymonitor.enums.EnergyType;
+
 /**
  *
  */

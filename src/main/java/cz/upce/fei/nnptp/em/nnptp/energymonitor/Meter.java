@@ -1,6 +1,8 @@
 package cz.upce.fei.nnptp.em.nnptp.energymonitor;
 
 import cz.upce.fei.nnptp.em.nnptp.energymonitor.entity.ObservedValue;
+import cz.upce.fei.nnptp.em.nnptp.energymonitor.enums.MeterType;
+
 import java.time.LocalDateTime;
 import java.util.List;
 
