@@ -25,10 +25,8 @@ public class State {
     }
 
     public void addConnection(ConnectionPoint newConnectionPoint) {
-        if (connectionPoints.contains(newConnectionPoint)) {
-            return;
+        if (!connectionPoints.contains(newConnectionPoint)) {
+            connectionPoints.add(newConnectionPoint);
         }
-
-        connectionPoints.add(newConnectionPoint);
     }
 }
