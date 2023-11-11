@@ -6,11 +6,11 @@ package cz.upce.fei.nnptp.em.nnptp.energymonitor;
 public class Distribution {
 
     private String name;
-    private String addr;
+    private String address;
 
-    public Distribution(String name, String addr) {
+    public Distribution(String name, String address) {
         this.name = name;
-        this.addr = addr;
+        this.address = address;
     }
 
     public String getName() {
@@ -21,14 +21,12 @@ public class Distribution {
         this.name = name;
     }
 
-    public String getAddr() {
-        return addr;
+    public String getAddress() {
+        return address;
     }
 
-    public void setAddr(String addr) {
-        this.addr = addr;
+    public void setAddress(String address) {
+        this.address = address;
     }
-    
-    
     
 }
