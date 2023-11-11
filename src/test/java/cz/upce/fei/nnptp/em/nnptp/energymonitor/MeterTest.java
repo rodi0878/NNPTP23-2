@@ -58,4 +58,12 @@ public class MeterTest {
         assertEquals(0.0, totalConsumedPower);
     }
     
+    @Test
+    public void testCalculateConsumedElectricityNull() {
+        LocalDateTime time = LocalDateTime.now();
+        Meter meter = new Meter(null, new Distribution("Cez", "Praha"), Meter.MeterType.ActualValue, null);
+        double totalConsumedPower = meter.calculateConsumedElectricits(time.minusDays(3), time.plusDays(5));
+        assertEquals(0.0, totalConsumedPower);
+    }
+    
 }
