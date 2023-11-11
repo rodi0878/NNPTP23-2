@@ -18,14 +18,14 @@ public class Meter {
         this.energy = energy;
         this.distribution = distribution;
         this.meterType = meterType;
-        this.observedValues = obVals;
+        this.obVals = obVals;
     }
 
     private Energy energy;
     private Distribution distribution;
     private MeterType meterType;
     
-    private List<ObservedValue> observedValues;
+    private List<ObservedValue> obVals;
 
     public Energy getEnergy() {
         return energy;
@@ -51,12 +51,12 @@ public class Meter {
         this.meterType = meterType;
     }
 
-    public List<ObservedValue> getObservedValues() {
-        return observedValues;
+    public List<ObservedValue> getObVals() {
+        return obVals;
     }
 
-    public void setObservedValues(List<ObservedValue> observedValues) {
-        this.observedValues = observedValues;
+    public void setObVals(List<ObservedValue> obVals) {
+        this.obVals = obVals;
     }
 
     /**
@@ -64,18 +64,18 @@ public class Meter {
      * @return total consumed power
      */
     public double calculateConsumedElectricits() {
-        if (observedValues == null || observedValues.isEmpty()) {
+        if (obVals == null || obVals.isEmpty()) {
             return 0.0;
         }
 
         double totalConsumedPower = 0.0;
 
         if (meterType == MeterType.CumulativeValue) {
-            ObservedValue first = observedValues.get(0);
-            ObservedValue last = observedValues.get(observedValues.size() - 1);
+            ObservedValue first = obVals.get(0);
+            ObservedValue last = obVals.get(obVals.size() - 1);
             totalConsumedPower = last.getValue() - first.getValue();
         } else if (meterType == MeterType.ActualValue) {
-            for (ObservedValue observedValue : observedValues) {
+            for (ObservedValue observedValue : obVals) {
                 totalConsumedPower += observedValue.getValue();
             }
         }
