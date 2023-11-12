@@ -78,9 +78,7 @@ public class Meter {
             for (ObservedValue observedValue : obVals) {
                 List<ObservedTagsAndFlags> tags = observedValue.getTagsAndFlags();
                 for (ObservedTagsAndFlags tag : tags) {
-                    if (tag instanceof ObservedTagsAndFlags.MeterReplacedJustAfterMeasurementTag) {
-                        ObservedTagsAndFlags.MeterReplacedJustAfterMeasurementTag meterTag =
-                                (ObservedTagsAndFlags.MeterReplacedJustAfterMeasurementTag) tag;
+                    if (tag instanceof ObservedTagsAndFlags.MeterReplacedJustAfterMeasurementTag meterTag) {
                         totalConsumedPower += observedValue.getValue() - lastMeterStartValue;
                         lastMeterStartValue = meterTag.getMeterStartValue();
                     }
