@@ -79,20 +79,16 @@ public class Meter {
             for (ObservedValue observedValue : observedValues) {
                 if(observedValue.getLocalDateTime().compareTo(from) >= 0 && observedValue.getLocalDateTime().compareTo(to) <= 0){
                     if(previousValue != 0.0){
-                        if(!observedValue.getTagsAndFlags().isEmpty()){
-                            totalConsumedElectricits += observedValue.getValue() - previousValue;
-                            for (ObservedTagsAndFlags tag : observedValue.getTagsAndFlags()) {
-                                if (tag instanceof ObservedTagsAndFlags.MeterReplacedJustAfterMeasurementTag newMeterTag) {
-                                    previousValue = newMeterTag.getMeterStartValue();
-                                }
+                        totalConsumedElectricits += observedValue.getValue() - previousValue;
+                    }
+                    previousValue = observedValue.getValue();
+                    if(!observedValue.getTagsAndFlags().isEmpty()){
+                        for (ObservedTagsAndFlags tag : observedValue.getTagsAndFlags()) {
+                            if (tag instanceof ObservedTagsAndFlags.MeterReplacedJustAfterMeasurementTag newMeterTag) {
+                                previousValue = newMeterTag.getMeterStartValue();
                             }
-                        }else{
-                            totalConsumedElectricits += observedValue.getValue() - previousValue;
-                            previousValue = observedValue.getValue();
-                        }                     
-                    }else{
-                        previousValue = observedValue.getValue();
-                    }                                     
+                        }
+                    }                                                   
                 }
             }
         }else if (meterType == MeterType.ActualValue) {
