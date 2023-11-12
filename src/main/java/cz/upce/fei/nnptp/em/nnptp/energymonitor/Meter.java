@@ -1,5 +1,6 @@
 package cz.upce.fei.nnptp.em.nnptp.energymonitor;
 
+import cz.upce.fei.nnptp.em.nnptp.energymonitor.entity.ObservedTagsAndFlags;
 import cz.upce.fei.nnptp.em.nnptp.energymonitor.entity.ObservedValue;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -71,9 +72,22 @@ public class Meter {
         double totalConsumedPower = 0.0;
 
         if (meterType == MeterType.CumulativeValue) {
-            ObservedValue first = obVals.get(0);
-            ObservedValue last = obVals.get(obVals.size() - 1);
-            totalConsumedPower = last.getValue() - first.getValue();
+            double lastValue = obVals.get(0).getValue();
+            double lastMeterStartValue = lastValue;
+
+            for (ObservedValue observedValue : obVals) {
+                List<ObservedTagsAndFlags> tags = observedValue.getTagsAndFlags();
+                for (ObservedTagsAndFlags tag : tags) {
+                    if (tag instanceof ObservedTagsAndFlags.MeterReplacedJustAfterMeasurementTag) {
+                        ObservedTagsAndFlags.MeterReplacedJustAfterMeasurementTag meterTag =
+                                (ObservedTagsAndFlags.MeterReplacedJustAfterMeasurementTag) tag;
+                        totalConsumedPower += observedValue.getValue() - lastMeterStartValue;
+                        lastMeterStartValue = meterTag.getMeterStartValue();
+                    }
+                }
+                lastValue = observedValue.getValue();
+            }
+            totalConsumedPower += lastValue - lastMeterStartValue;
         } else if (meterType == MeterType.ActualValue) {
             for (ObservedValue observedValue : obVals) {
                 totalConsumedPower += observedValue.getValue();
