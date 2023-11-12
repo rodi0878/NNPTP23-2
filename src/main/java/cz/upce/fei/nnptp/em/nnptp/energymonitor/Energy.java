@@ -12,7 +12,7 @@ public class Energy {
         HotWater,
         CentralHeating
     }
-    
+
     private String name;
 
     public String getName() {
@@ -22,19 +22,19 @@ public class Energy {
     public void setName(String name) {
         this.name = name;
     }
-    private EnergyType enetEnergyType;
+    private EnergyType energyType;
     private double pricePerMeasuredUnit; // TODO move to initial price tag to observed values ?
 
-    public Energy(EnergyType enetEnergyType) {
-        this.enetEnergyType = enetEnergyType;
+    public Energy(EnergyType energyType) {
+        this.energyType = energyType;
     }
 
-    public EnergyType getEnetEnergyType() {
-        return enetEnergyType;
+    public EnergyType getEnergyType() {
+        return energyType;
     }
 
-    public void setEnetEnergyType(EnergyType enetEnergyType) {
-        this.enetEnergyType = enetEnergyType;
+    public void setEnergyType(EnergyType energyType) {
+        this.energyType = energyType;
     }
 
     public double getPricePerMeasuredUnit() {
