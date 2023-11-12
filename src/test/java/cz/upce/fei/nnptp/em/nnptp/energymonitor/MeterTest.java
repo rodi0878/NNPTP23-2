@@ -1,5 +1,6 @@
 package cz.upce.fei.nnptp.em.nnptp.energymonitor;
 
+import cz.upce.fei.nnptp.em.nnptp.energymonitor.entity.ObservedTagsAndFlags;
 import cz.upce.fei.nnptp.em.nnptp.energymonitor.entity.ObservedValue;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -64,6 +65,34 @@ public class MeterTest {
         Meter meter = new Meter(null, new Distribution("Cez", "Praha"), Meter.MeterType.ActualValue, null);
         double totalConsumedPower = meter.calculateConsumedElectricits(time.minusDays(3), time.plusDays(5));
         assertEquals(0.0, totalConsumedPower);
+    }
+    
+        @Test
+    public void testCalculateConsumedElectricitsCumulativeChangedMeter() {
+        List<ObservedValue> list = new ArrayList<>();
+        LocalDateTime time = LocalDateTime.now();
+        list.add(new ObservedValue(time.minusDays(4),1.3));
+        list.add(new ObservedValue(time.minusDays(2),2.6));
+        list.add(new ObservedValue(time,5.5));
+        
+        ObservedValue observedWithFirstNewMeter = new ObservedValue(time.plusDays(1),12.0);
+        observedWithFirstNewMeter.getTagsAndFlags().add(new ObservedTagsAndFlags.MeterReplacedJustAfterMeasurementTag(
+                "T1", 40.0));
+        list.add(observedWithFirstNewMeter);
+                
+        list.add(new ObservedValue(time.plusDays(1),52.0));
+        list.add(new ObservedValue(time.plusDays(4),58.6));
+        
+        ObservedValue observedWithSecondNewMeter = new ObservedValue(time.plusDays(9),62.6);
+        observedWithSecondNewMeter.getTagsAndFlags().add(new ObservedTagsAndFlags.MeterReplacedJustAfterMeasurementTag(
+                "T2", 20.0));
+        list.add(observedWithSecondNewMeter);
+        list.add(new ObservedValue(time.plusDays(10),28.6));
+        list.add(new ObservedValue(time.plusMonths(2),33.6));   
+        Meter meter = new Meter(null, new Distribution("Cez", "Praha"), Meter.MeterType.CumulativeValue, list);
+        
+        double totalConsumedPower = meter.calculateConsumedElectricits(time.minusDays(3), time.plusDays(10));
+        assertEquals(40.6, totalConsumedPower);       
     }
     
 }
