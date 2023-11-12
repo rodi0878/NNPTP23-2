@@ -1,5 +1,6 @@
 package cz.upce.fei.nnptp.em.nnptp.energymonitor;
 
+import cz.upce.fei.nnptp.em.nnptp.energymonitor.entity.ObservedTagsAndFlags;
 import cz.upce.fei.nnptp.em.nnptp.energymonitor.entity.ObservedValue;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -13,7 +14,7 @@ public class Meter {
         CumulativeValue,
         ActualValue
     }
-    
+
     public Meter(Energy energy, Distribution distribution, MeterType meterType, List<ObservedValue> observedValues) {
         this.energy = energy;
         this.distribution = distribution;
@@ -24,7 +25,7 @@ public class Meter {
     private Energy energy;
     private Distribution distribution;
     private MeterType meterType;
-    
+
     private List<ObservedValue> observedValues;
 
     public Energy getEnergy() {
@@ -71,15 +72,45 @@ public class Meter {
     }
 
     public double calculatePrice() {
-        double totalConsumedElectricity = calculateConsumedElectricits();
+        double totalPrice = 0.0;
+        double currentUnitPrice = energy.getPricePerMeasuredUnit();
+        double lastValue = 0.0;
 
-        if (totalConsumedElectricity == 0.0 || getObVals() == null) {
+        if (getObservedValues() == null || getObservedValues().isEmpty()) {
             return 0.0;
         }
-        
-        double pricePerMeasuredUnit = energy.getPricePerMeasuredUnit();
-        
-        double totalPrice = totalConsumedElectricity * pricePerMeasuredUnit;
+
+        for (int i = 0; i < getObservedValues().size(); i++) {
+            ObservedValue observedValue = getObservedValues().get(i);
+
+            for (ObservedTagsAndFlags tag : observedValue.getTagsAndFlags()) {
+                if (tag instanceof ObservedTagsAndFlags.UnitPriceChangedJustAfterMeasurementTag) {
+                    ObservedTagsAndFlags.UnitPriceChangedJustAfterMeasurementTag priceChangeTag
+                            = (ObservedTagsAndFlags.UnitPriceChangedJustAfterMeasurementTag) tag;
+                    currentUnitPrice = priceChangeTag.getNewUnitPrice();
+                }
+
+                if (tag instanceof ObservedTagsAndFlags.MeterReplacedJustAfterMeasurementTag) {
+                    ObservedTagsAndFlags.MeterReplacedJustAfterMeasurementTag meterReplacementTag
+                            = (ObservedTagsAndFlags.MeterReplacedJustAfterMeasurementTag) tag;
+                    lastValue = meterReplacementTag.getMeterStartValue();
+                }
+            }
+
+            double consumedElectricity;
+            if (meterType == MeterType.CumulativeValue) {
+                if (i == 0) {
+                    lastValue = observedValue.getValue();
+                    continue;
+                }
+                consumedElectricity = observedValue.getValue() - lastValue;
+                lastValue = observedValue.getValue();
+            } else {
+                consumedElectricity = observedValue.getValue();
+            }
+
+            totalPrice += consumedElectricity * currentUnitPrice;
+        }
 
         return totalPrice;
     }
