@@ -62,7 +62,7 @@ public class Meter {
     public double calculateConsumedElectricits() {
         // TODO calculate consumed power from all measurements
         // according to metertype and observedvalues
-        throw new RuntimeException();
+        return 0.0;
     }
 
     public double calculateConsumedElectricits(LocalDateTime from, LocalDateTime to) {
@@ -73,10 +73,10 @@ public class Meter {
     public double calculatePrice() {
         double totalConsumedElectricity = calculateConsumedElectricits();
 
-        if (totalConsumedElectricity == 0.0 || obVals == null) {
+        if (totalConsumedElectricity == 0.0 || getObVals() == null) {
             return 0.0;
         }
-
+        
         double pricePerMeasuredUnit = energy.getPricePerMeasuredUnit();
         
         double totalPrice = totalConsumedElectricity * pricePerMeasuredUnit;
