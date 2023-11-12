@@ -65,17 +65,17 @@ public class Meter {
      * @return total consumed power
      */
     public double calculateConsumedElectricits() {
-        if (obVals == null || obVals.isEmpty()) {
+        if (observedValues == null || observedValues.isEmpty()) {
             return 0.0;
         }
 
         double totalConsumedPower = 0.0;
 
         if (meterType == MeterType.CumulativeValue) {
-            double lastValue = obVals.get(0).getValue();
+            double lastValue = observedValues.get(0).getValue();
             double lastMeterStartValue = lastValue;
 
-            for (ObservedValue observedValue : obVals) {
+            for (ObservedValue observedValue : observedValues) {
                 List<ObservedTagsAndFlags> tags = observedValue.getTagsAndFlags();
                 lastValue = observedValue.getValue();
                 for (ObservedTagsAndFlags tag : tags) {
@@ -87,7 +87,7 @@ public class Meter {
             }
             totalConsumedPower += lastValue - lastMeterStartValue;
         } else if (meterType == MeterType.ActualValue) {
-            for (ObservedValue observedValue : obVals) {
+            for (ObservedValue observedValue : observedValues) {
                 totalConsumedPower += observedValue.getValue();
             }
         }
