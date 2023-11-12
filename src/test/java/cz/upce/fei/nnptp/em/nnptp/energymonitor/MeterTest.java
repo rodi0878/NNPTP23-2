@@ -70,6 +70,36 @@ public class MeterTest {
     }
 
     @Test
+    public void testCalculateConsumedElectricityWithMultipleMeterChange() {
+        LocalDateTime time = LocalDateTime.now();
+
+        List<ObservedValue> observedValues = new ArrayList<>();
+        observedValues.add(new ObservedValue(time, 100.0));
+
+        ObservedValue observerWithMeterChange1 = new ObservedValue(time.plusHours(1), 150.0);
+        observerWithMeterChange1.getTagsAndFlags().add(new ObservedTagsAndFlags.MeterReplacedJustAfterMeasurementTag(
+                "newMeterId1", 50.0));
+        observedValues.add(observerWithMeterChange1);
+
+        observedValues.add(new ObservedValue(time.plusHours(2), 110.0));
+        observedValues.add(new ObservedValue(time.plusHours(2), 150.0));
+
+        ObservedValue observerWithMeterChange2 = new ObservedValue(time.plusHours(3), 170.0);
+        observerWithMeterChange2.getTagsAndFlags().add(new ObservedTagsAndFlags.MeterReplacedJustAfterMeasurementTag(
+                "newMeterId2", 10.0));
+        observedValues.add(observerWithMeterChange2);
+
+        observedValues.add(new ObservedValue(time.plusHours(4), 30.0));
+
+
+        Meter meter = new Meter(null, null, Meter.MeterType.CumulativeValue, observedValues);
+        double consumedPower = meter.calculateConsumedElectricits();
+
+        // The expected result should be 150 - 100 + 170 - 50 + 30 - 10 = 190
+        assertEquals(190, consumedPower);
+    }
+
+    @Test
     public void testCalculateConsumedElectricityActual() {
         LocalDateTime time1 = LocalDateTime.now();
         LocalDateTime time2 = time1.plusHours(1);
