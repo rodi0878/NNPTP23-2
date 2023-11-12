@@ -65,7 +65,7 @@ public class MeterTest {
         Meter meter = new Meter(null, null, Meter.MeterType.CumulativeValue, observedValues);
         double consumedPower = meter.calculateConsumedElectricits();
 
-        // Očekávaný výsledek by měl být 150 - 100 + 110 - 50 = 110
+        // The expected result should be 150 - 100 + 110 - 50 = 110
         assertEquals(110, consumedPower);
     }
 
