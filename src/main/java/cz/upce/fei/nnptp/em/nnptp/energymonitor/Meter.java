@@ -15,18 +15,18 @@ public class Meter {
         ActualValue
     }
     
-    public Meter(Energy energy, Distribution distribution, MeterType meterType, List<ObservedValue> obVals) {
+    public Meter(Energy energy, Distribution distribution, MeterType meterType, List<ObservedValue> observedValues) {
         this.energy = energy;
         this.distribution = distribution;
         this.meterType = meterType;
-        this.obVals = obVals;
+        this.observedValues = observedValues;
     }
 
     private Energy energy;
     private Distribution distribution;
     private MeterType meterType;
     
-    private List<ObservedValue> obVals;
+    private List<ObservedValue> observedValues;
 
     public Energy getEnergy() {
         return energy;
@@ -52,12 +52,12 @@ public class Meter {
         this.meterType = meterType;
     }
 
-    public List<ObservedValue> getObVals() {
-        return obVals;
+    public List<ObservedValue> getObservedValues() {
+        return observedValues;
     }
 
-    public void setObVals(List<ObservedValue> obVals) {
-        this.obVals = obVals;
+    public void setObservedValues(List<ObservedValue> observedValues) {
+        this.observedValues = observedValues;
     }
 
     /**
