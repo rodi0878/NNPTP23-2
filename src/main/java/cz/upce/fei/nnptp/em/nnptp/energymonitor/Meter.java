@@ -77,13 +77,13 @@ public class Meter {
 
             for (ObservedValue observedValue : obVals) {
                 List<ObservedTagsAndFlags> tags = observedValue.getTagsAndFlags();
+                lastValue = observedValue.getValue();
                 for (ObservedTagsAndFlags tag : tags) {
                     if (tag instanceof ObservedTagsAndFlags.MeterReplacedJustAfterMeasurementTag meterTag) {
-                        totalConsumedPower += observedValue.getValue() - lastMeterStartValue;
+                        totalConsumedPower += lastValue - lastMeterStartValue;
                         lastMeterStartValue = meterTag.getMeterStartValue();
                     }
                 }
-                lastValue = observedValue.getValue();
             }
             totalConsumedPower += lastValue - lastMeterStartValue;
         } else if (meterType == MeterType.ActualValue) {
