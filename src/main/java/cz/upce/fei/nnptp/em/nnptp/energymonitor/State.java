@@ -9,7 +9,7 @@ import java.util.List;
  */
 public class State {
 
-    private List<ConnectionPoint> connectionPoints;
+    private final List<ConnectionPoint> connectionPoints;
 
     public State() {
         connectionPoints  = new ArrayList<>();
