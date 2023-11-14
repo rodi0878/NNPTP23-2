@@ -95,8 +95,38 @@ public class Meter {
     }
     
     public double calculateConsumedElectricits(LocalDateTime from, LocalDateTime to) {
-                // TODO calculate consumed power from selected measurements
-        throw new RuntimeException();
+       //Calculate consumed power from selected measurements
+        double totalConsumedElectricits = 0.0;
+        
+        if (observedValues == null || observedValues.isEmpty()) {
+            return totalConsumedElectricits;
+        }
+        
+        if (meterType == MeterType.CumulativeValue) {
+            double previousValue = 0.0;
+            for (ObservedValue observedValue : observedValues) {
+                if(observedValue.getLocalDateTime().compareTo(from) >= 0 && observedValue.getLocalDateTime().compareTo(to) <= 0){
+                    if(previousValue != 0.0){
+                        totalConsumedElectricits += observedValue.getValue() - previousValue;
+                    }
+                    previousValue = observedValue.getValue();
+                    if(!observedValue.getTagsAndFlags().isEmpty()){
+                        for (ObservedTagsAndFlags tag : observedValue.getTagsAndFlags()) {
+                            if (tag instanceof ObservedTagsAndFlags.MeterReplacedJustAfterMeasurementTag newMeterTag) {
+                                previousValue = newMeterTag.getMeterStartValue();
+                            }
+                        }
+                    }                                                   
+                }
+            }
+        }else if (meterType == MeterType.ActualValue) {
+            for (ObservedValue observedValue : observedValues) {
+                if(observedValue.getLocalDateTime().compareTo(from) >= 0 && observedValue.getLocalDateTime().compareTo(to) <= 0){
+                    totalConsumedElectricits += observedValue.getValue();
+                }
+            }
+        }
+        return totalConsumedElectricits;
     }
     
     public double calculatePrice() {
