@@ -97,7 +97,7 @@ public class MeterTest {
     }
 
     @Test
-    public void testCalculateConsumedElectricityNull() {
+    public void testCalculateConsumedElectricityNull2() {
         Meter meter = new Meter(null, null, Meter.MeterType.CumulativeValue, null);
 
         double consumedPower = meter.calculateConsumedElectricits();
@@ -105,7 +105,7 @@ public class MeterTest {
     }
 
     @Test
-    public void testCalculateConsumedElectricityEmpty() {
+    public void testCalculateConsumedElectricityEmpty2() {
         List<ObservedValue> observedValues = new ArrayList<>();
         Meter meter = new Meter(null, null, Meter.MeterType.CumulativeValue, observedValues);
 
