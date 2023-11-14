@@ -20,14 +20,9 @@ public class State {
     }
     
     public void addConnection(ConnectionPoint cp) {
-        for (ConnectionPoint connectionPoint : connectionPoints) {
-            if (connectionPoint == cp)
-                return;
-            
-            
+        if (!connectionPoints.contains(cp)) {
+            connectionPoints.add(cp);
         }
-        
-        connectionPoints.add(cp);
     }
 
     
