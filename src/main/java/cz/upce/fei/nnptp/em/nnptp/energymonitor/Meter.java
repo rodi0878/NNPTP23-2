@@ -1,5 +1,6 @@
 package cz.upce.fei.nnptp.em.nnptp.energymonitor;
 
+import cz.upce.fei.nnptp.em.nnptp.energymonitor.entity.ObservedTagsAndFlags;
 import cz.upce.fei.nnptp.em.nnptp.energymonitor.entity.ObservedValue;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -58,11 +59,39 @@ public class Meter {
     public void setObservedValues(List<ObservedValue> observedValues) {
         this.observedValues = observedValues;
     }
-    
+
+    /**
+     * Calculate consumed electrics by selected MeterType.
+     * @return total consumed power
+     */
     public double calculateConsumedElectricits() {
-        // TODO calculate consumed power from all measurements
-        // according to metertype and observedvalues
-        throw new RuntimeException();
+        if (observedValues == null || observedValues.isEmpty()) {
+            return 0.0;
+        }
+
+        double totalConsumedPower = 0.0;
+
+        if (meterType == MeterType.CumulativeValue) {
+            double lastValue = observedValues.get(0).getValue();
+            double lastMeterStartValue = lastValue;
+
+            for (ObservedValue observedValue : observedValues) {
+                lastValue = observedValue.getValue();
+                for (ObservedTagsAndFlags tag : observedValue.getTagsAndFlags()) {
+                    if (tag instanceof ObservedTagsAndFlags.MeterReplacedJustAfterMeasurementTag meterTag) {
+                        totalConsumedPower += lastValue - lastMeterStartValue;
+                        lastMeterStartValue = meterTag.getMeterStartValue();
+                    }
+                }
+            }
+            totalConsumedPower += lastValue - lastMeterStartValue;
+        } else if (meterType == MeterType.ActualValue) {
+            for (ObservedValue observedValue : observedValues) {
+                totalConsumedPower += observedValue.getValue();
+            }
+        }
+
+        return totalConsumedPower;
     }
     
     public double calculateConsumedElectricits(LocalDateTime from, LocalDateTime to) {
