@@ -141,6 +141,20 @@ public class Meter {
         for (int i = 0; i < getObservedValues().size(); i++) {
             ObservedValue observedValue = getObservedValues().get(i);
 
+            double consumedElectricity = 0.0;
+            if (meterType == MeterType.CumulativeValue) {
+                if (i == 0) {
+                    lastValue = observedValue.getValue();
+                    continue;
+                }
+                consumedElectricity = observedValue.getValue() - lastValue;
+                lastValue = observedValue.getValue();
+            } else {
+                consumedElectricity = observedValue.getValue();
+            }
+
+            totalPrice += consumedElectricity * currentUnitPrice;
+
             for (ObservedTagsAndFlags tag : observedValue.getTagsAndFlags()) {
                 if (tag instanceof ObservedTagsAndFlags.UnitPriceChangedJustAfterMeasurementTag) {
                     ObservedTagsAndFlags.UnitPriceChangedJustAfterMeasurementTag priceChangeTag
@@ -154,20 +168,6 @@ public class Meter {
                     lastValue = meterReplacementTag.getMeterStartValue();
                 }
             }
-
-            double consumedElectricity;
-            if (meterType == MeterType.CumulativeValue) {
-                if (i == 0) {
-                    lastValue = observedValue.getValue();
-                    continue;
-                }
-                consumedElectricity = observedValue.getValue() - lastValue;
-                lastValue = observedValue.getValue();
-            } else {
-                consumedElectricity = observedValue.getValue();
-            }
-
-            totalPrice += consumedElectricity * currentUnitPrice;
         }
 
         return totalPrice;
