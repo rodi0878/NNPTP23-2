@@ -34,7 +34,7 @@ public abstract class ObservedTagsAndFlags {
         
     }
     
-    private static class UnitPriceChangedJustAfterMeasurementTag extends ObservedTagsAndFlags {
+    public static class UnitPriceChangedJustAfterMeasurementTag extends ObservedTagsAndFlags {
         private double newUnitPrice;
 
         public UnitPriceChangedJustAfterMeasurementTag(double newUnitPrice) {

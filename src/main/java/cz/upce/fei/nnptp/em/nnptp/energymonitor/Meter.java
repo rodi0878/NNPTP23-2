@@ -9,12 +9,12 @@ import java.util.List;
  *
  */
 public class Meter {
-    
+
     public static enum MeterType {
         CumulativeValue,
         ActualValue
     }
-    
+
     public Meter(Energy energy, Distribution distribution, MeterType meterType, List<ObservedValue> observedValues) {
         this.energy = energy;
         this.distribution = distribution;
@@ -25,7 +25,7 @@ public class Meter {
     private Energy energy;
     private Distribution distribution;
     private MeterType meterType;
-    
+
     private List<ObservedValue> observedValues;
 
     public Energy getEnergy() {
@@ -93,7 +93,7 @@ public class Meter {
 
         return totalConsumedPower;
     }
-    
+
     public double calculateConsumedElectricits(LocalDateTime from, LocalDateTime to) {
        //Calculate consumed power from selected measurements
         double totalConsumedElectricits = 0.0;
@@ -128,17 +128,55 @@ public class Meter {
         }
         return totalConsumedElectricits;
     }
-    
+
     public double calculatePrice() {
-        // TODO ...
-        throw new  RuntimeException();
+        double totalPrice = 0.0;
+        double currentUnitPrice = energy.getPricePerMeasuredUnit();
+        double lastValue = 0.0;
+
+        if (getObservedValues() == null || getObservedValues().isEmpty()) {
+            return 0.0;
+        }
+
+        for (int i = 0; i < getObservedValues().size(); i++) {
+            ObservedValue observedValue = getObservedValues().get(i);
+
+            double consumedElectricity = 0.0;
+            if (meterType == MeterType.CumulativeValue) {
+                if (i == 0) {
+                    lastValue = observedValue.getValue();
+                    continue;
+                }
+                consumedElectricity = observedValue.getValue() - lastValue;
+                lastValue = observedValue.getValue();
+            } else {
+                consumedElectricity = observedValue.getValue();
+            }
+
+            totalPrice += consumedElectricity * currentUnitPrice;
+
+            for (ObservedTagsAndFlags tag : observedValue.getTagsAndFlags()) {
+                if (tag instanceof ObservedTagsAndFlags.UnitPriceChangedJustAfterMeasurementTag) {
+                    ObservedTagsAndFlags.UnitPriceChangedJustAfterMeasurementTag priceChangeTag
+                            = (ObservedTagsAndFlags.UnitPriceChangedJustAfterMeasurementTag) tag;
+                    currentUnitPrice = priceChangeTag.getNewUnitPrice();
+                }
+
+                if (tag instanceof ObservedTagsAndFlags.MeterReplacedJustAfterMeasurementTag) {
+                    ObservedTagsAndFlags.MeterReplacedJustAfterMeasurementTag meterReplacementTag
+                            = (ObservedTagsAndFlags.MeterReplacedJustAfterMeasurementTag) tag;
+                    lastValue = meterReplacementTag.getMeterStartValue();
+                }
+            }
+        }
+
+        return totalPrice;
     }
-    
+
     public double calculatePrice(LocalDateTime from, LocalDateTime to) {
         // TODO
         throw new RuntimeException();
-        
+
     }
 
-    
 }
