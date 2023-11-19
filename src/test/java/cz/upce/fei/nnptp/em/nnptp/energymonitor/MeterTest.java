@@ -16,7 +16,7 @@ public class MeterTest {
     }
     
     @Test
-    public void testCalculateConsumedElectricitsActual() {
+    public void testCalculateConsumedElectricityInIntervalActual() {
         List<ObservedValue> list = new ArrayList<>();
         LocalDateTime time = LocalDateTime.now();
         list.add(new ObservedValue(time.minusDays(4),5.0));
@@ -28,12 +28,12 @@ public class MeterTest {
         list.add(new ObservedValue(time.plusMonths(2),56.8));      
         Meter meter = new Meter(null, new Distribution("Cez", "Praha"), Meter.MeterType.ActualValue, list);
         
-        double totalConsumedPower = meter.calculateConsumedElectricits(time.minusDays(3), time.plusDays(5));
+        double totalConsumedPower = meter.calculateConsumedElectricity(time.minusDays(3), time.plusDays(5));
         assertEquals(29.1, totalConsumedPower);       
     }
     
     @Test
-    public void testCalculateConsumedElectricitsCumulative() {
+    public void testCalculateConsumedElectricityInIntervalCumulative() {
         List<ObservedValue> list = new ArrayList<>();
         LocalDateTime time = LocalDateTime.now();
         list.add(new ObservedValue(time.minusDays(4),1.3));
@@ -45,30 +45,30 @@ public class MeterTest {
         list.add(new ObservedValue(time.plusMonths(2),33.6));   
         Meter meter = new Meter(null, new Distribution("Cez", "Praha"), Meter.MeterType.CumulativeValue, list);
         
-        double totalConsumedPower = meter.calculateConsumedElectricits(time.minusDays(3), time.plusDays(5));
+        double totalConsumedPower = meter.calculateConsumedElectricity(time.minusDays(3), time.plusDays(5));
         assertEquals(16.0, totalConsumedPower);       
     }
     
     @Test
-    public void testCalculateConsumedElectricityEmpty() {
+    public void testCalculateConsumedElectricityInIntervalEmpty() {
         List<ObservedValue> list = new ArrayList<>();
         LocalDateTime time = LocalDateTime.now();
         Meter meter = new Meter(null, new Distribution("Cez", "Praha"), Meter.MeterType.ActualValue, list);
 
-        double totalConsumedPower = meter.calculateConsumedElectricits(time.minusDays(3), time.plusDays(5));
+        double totalConsumedPower = meter.calculateConsumedElectricity(time.minusDays(3), time.plusDays(5));
         assertEquals(0.0, totalConsumedPower);
     }
     
     @Test
-    public void testCalculateConsumedElectricityNull() {
+    public void testCalculateConsumedElectricityInIntervalNull() {
         LocalDateTime time = LocalDateTime.now();
         Meter meter = new Meter(null, new Distribution("Cez", "Praha"), Meter.MeterType.ActualValue, null);
-        double totalConsumedPower = meter.calculateConsumedElectricits(time.minusDays(3), time.plusDays(5));
+        double totalConsumedPower = meter.calculateConsumedElectricity(time.minusDays(3), time.plusDays(5));
         assertEquals(0.0, totalConsumedPower);
     }
     
         @Test
-    public void testCalculateConsumedElectricitsCumulativeChangedMeter() {
+    public void testCalculateConsumedElectricityInIntervalCumulativeChangedMeter() {
         List<ObservedValue> list = new ArrayList<>();
         LocalDateTime time = LocalDateTime.now();
         list.add(new ObservedValue(time.minusDays(4),1.3));
@@ -91,24 +91,24 @@ public class MeterTest {
         list.add(new ObservedValue(time.plusMonths(2),33.6));   
         Meter meter = new Meter(null, new Distribution("Cez", "Praha"), Meter.MeterType.CumulativeValue, list);
         
-        double totalConsumedPower = meter.calculateConsumedElectricits(time.minusDays(3), time.plusDays(10));
+        double totalConsumedPower = meter.calculateConsumedElectricity(time.minusDays(3), time.plusDays(10));
         assertEquals(40.6, totalConsumedPower);       
     }
 
     @Test
-    public void testCalculateConsumedElectricityNull2() {
+    public void testCalculateConsumedElectricityNull() {
         Meter meter = new Meter(null, null, Meter.MeterType.CumulativeValue, null);
 
-        double consumedPower = meter.calculateConsumedElectricits();
+        double consumedPower = meter.calculateConsumedElectricity();
         assertEquals(0, consumedPower);
     }
 
     @Test
-    public void testCalculateConsumedElectricityEmpty2() {
+    public void testCalculateConsumedElectricityEmpty() {
         List<ObservedValue> observedValues = new ArrayList<>();
         Meter meter = new Meter(null, null, Meter.MeterType.CumulativeValue, observedValues);
 
-        double consumedPower = meter.calculateConsumedElectricits();
+        double consumedPower = meter.calculateConsumedElectricity();
         assertEquals(0, consumedPower);
     }
 
@@ -122,7 +122,7 @@ public class MeterTest {
         observedValues.add(new ObservedValue(time2, 210.0));
         Meter meter = new Meter(null, null, Meter.MeterType.CumulativeValue, observedValues);
         
-        double consumedPower = meter.calculateConsumedElectricits();
+        double consumedPower = meter.calculateConsumedElectricity();
         assertEquals(110, consumedPower);
     }
 
@@ -143,7 +143,7 @@ public class MeterTest {
         observedValues.add(new ObservedValue(time3, 110.0));
 
         Meter meter = new Meter(null, null, Meter.MeterType.CumulativeValue, observedValues);
-        double consumedPower = meter.calculateConsumedElectricits();
+        double consumedPower = meter.calculateConsumedElectricity();
 
         // The expected result should be 150 - 100 + 110 - 50 = 110
         assertEquals(110, consumedPower);
@@ -173,7 +173,7 @@ public class MeterTest {
 
 
         Meter meter = new Meter(null, null, Meter.MeterType.CumulativeValue, observedValues);
-        double consumedPower = meter.calculateConsumedElectricits();
+        double consumedPower = meter.calculateConsumedElectricity();
 
         // The expected result should be 150 - 100 + 170 - 50 + 30 - 10 = 190
         assertEquals(190, consumedPower);
@@ -190,7 +190,7 @@ public class MeterTest {
         observedValues.add(new ObservedValue(time3, 30.0));
         Meter meter = new Meter(null, null, Meter.MeterType.ActualValue,observedValues);
 
-        double consumedPower = meter.calculateConsumedElectricits();
+        double consumedPower = meter.calculateConsumedElectricity();
         assertEquals(60.0, consumedPower);
     }
     

@@ -64,7 +64,7 @@ public class Meter {
      * Calculate consumed electrics by selected MeterType.
      * @return total consumed power
      */
-    public double calculateConsumedElectricits() {
+    public double calculateConsumedElectricity() {
         if (observedValues == null || observedValues.isEmpty()) {
             return 0.0;
         }
@@ -94,12 +94,12 @@ public class Meter {
         return totalConsumedPower;
     }
 
-    public double calculateConsumedElectricits(LocalDateTime from, LocalDateTime to) {
+    public double calculateConsumedElectricity(LocalDateTime from, LocalDateTime to) {
        //Calculate consumed power from selected measurements
-        double totalConsumedElectricits = 0.0;
+        double totalConsumedElectricity = 0.0;
         
         if (observedValues == null || observedValues.isEmpty()) {
-            return totalConsumedElectricits;
+            return totalConsumedElectricity;
         }
         
         if (meterType == MeterType.CumulativeValue) {
@@ -107,7 +107,7 @@ public class Meter {
             for (ObservedValue observedValue : observedValues) {
                 if(observedValue.getLocalDateTime().compareTo(from) >= 0 && observedValue.getLocalDateTime().compareTo(to) <= 0){
                     if(previousValue != 0.0){
-                        totalConsumedElectricits += observedValue.getValue() - previousValue;
+                        totalConsumedElectricity += observedValue.getValue() - previousValue;
                     }
                     previousValue = observedValue.getValue();
                     if(!observedValue.getTagsAndFlags().isEmpty()){
@@ -122,11 +122,11 @@ public class Meter {
         }else if (meterType == MeterType.ActualValue) {
             for (ObservedValue observedValue : observedValues) {
                 if(observedValue.getLocalDateTime().compareTo(from) >= 0 && observedValue.getLocalDateTime().compareTo(to) <= 0){
-                    totalConsumedElectricits += observedValue.getValue();
+                    totalConsumedElectricity += observedValue.getValue();
                 }
             }
         }
-        return totalConsumedElectricits;
+        return totalConsumedElectricity;
     }
 
     public double calculatePrice() {
