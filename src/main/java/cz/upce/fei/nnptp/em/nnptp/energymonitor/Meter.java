@@ -86,9 +86,7 @@ public class Meter {
             }
             totalConsumedPower += lastValue - lastMeterStartValue;
         } else if (meterType == MeterType.ActualValue) {
-            for (ObservedValue observedValue : observedValues) {
-                totalConsumedPower += observedValue.getValue();
-            }
+            totalConsumedPower = observedValues.stream().mapToDouble(ObservedValue::getValue).sum();
         }
 
         return totalConsumedPower;
