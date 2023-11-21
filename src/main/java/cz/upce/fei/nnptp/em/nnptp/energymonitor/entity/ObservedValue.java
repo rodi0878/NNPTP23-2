@@ -40,7 +40,9 @@ public class ObservedValue {
         return tagsAndFlags;
     }
     
-    public void setTagsAndFlags(List<ObservedTagsAndFlags> tagsAndFlags) {
-        this.tagsAndFlags = tagsAndFlags;
-    }  
+    public void addTagsAndFlags(ObservedTagsAndFlags tf) {
+        if (!tagsAndFlags.contains(tf)) {
+            tagsAndFlags.add(tf);
+        }
+    }
 }
