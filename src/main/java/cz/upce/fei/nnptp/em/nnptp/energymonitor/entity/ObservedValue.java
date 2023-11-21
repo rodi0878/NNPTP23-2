@@ -39,8 +39,8 @@ public class ObservedValue {
     public List<ObservedTagsAndFlags> getTagsAndFlags() {
         return tagsAndFlags;
     }
-
     
-    
-    
+    public void setTagsAndFlags(List<ObservedTagsAndFlags> tagsAndFlags) {
+        this.tagsAndFlags = tagsAndFlags;
+    }  
 }
