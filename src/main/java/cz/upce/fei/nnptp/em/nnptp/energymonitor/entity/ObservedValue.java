@@ -60,4 +60,10 @@ public class ObservedValue {
         return null;
     }
 
+    public void addTagsAndFlags(ObservedTagsAndFlags tf) {
+        if (!tagsAndFlags.contains(tf)) {
+            tagsAndFlags.add(tf);
+        }
+    }
+
 }
