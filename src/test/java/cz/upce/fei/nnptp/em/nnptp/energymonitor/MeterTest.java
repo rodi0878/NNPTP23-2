@@ -196,7 +196,7 @@ public class MeterTest {
     
     @Test
     public void testCalculatePriceWithCumulativeMeter() {
-        Energy energy = new Energy(Energy.EnergyType.Electricity);
+        Energy energy = new Energy(Energy.EnergyType.ELECTRICITY);
         energy.setPricePerMeasuredUnit(10.0);
 
         List<ObservedValue> observedValues = new ArrayList<>();
@@ -212,7 +212,7 @@ public class MeterTest {
 
     @Test
     public void testCalculatePriceWithActualMeter() {
-        Energy energy = new Energy(Energy.EnergyType.Gas);
+        Energy energy = new Energy(Energy.EnergyType.GAS);
         energy.setPricePerMeasuredUnit(20.0);
 
         List<ObservedValue> observedValues = new ArrayList<>();
@@ -228,7 +228,7 @@ public class MeterTest {
 
     @Test
     public void testCalculatePriceWithPriceChange() {
-        Energy energy = new Energy(Energy.EnergyType.HotWater);
+        Energy energy = new Energy(Energy.EnergyType.HOT_WATER);
         energy.setPricePerMeasuredUnit(5.0);
         
         List<ObservedValue> observedValues = new ArrayList<>();
@@ -251,7 +251,7 @@ public class MeterTest {
     
     @Test
     public void testCalculatePriceWithPriceAndMeterChange() {
-        Energy energy = new Energy(Energy.EnergyType.HotWater);
+        Energy energy = new Energy(Energy.EnergyType.HOT_WATER);
         energy.setPricePerMeasuredUnit(5.0);
         
         List<ObservedValue> observedValues = new ArrayList<>();
@@ -272,5 +272,15 @@ public class MeterTest {
         
         double expectedPrice = 1500.0;
         assertEquals(expectedPrice, meter.calculatePrice());
+    }
+    
+        public void testAddToTAgsAndFlags() {
+            ObservedValue observedValue = new ObservedValue(LocalDateTime.now(), 50.0);
+            observedValue.addTagsAndFlags(new ObservedTagsAndFlags.MeterReplacedJustAfterMeasurementTag(
+                "newMeterId2", 10.0));
+            observedValue.addTagsAndFlags(new ObservedTagsAndFlags.UnitPriceChangedJustAfterMeasurementTag(10.0));
+        
+        double listSize = observedValue.getTagsAndFlags().size();
+        assertEquals(2, listSize);
     }
 }
