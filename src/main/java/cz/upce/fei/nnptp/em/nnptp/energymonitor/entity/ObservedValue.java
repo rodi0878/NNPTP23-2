@@ -11,7 +11,7 @@ public class ObservedValue {
 
     private LocalDateTime localDateTime;
     private double value;
-    
+
     private List<ObservedTagsAndFlags> tagsAndFlags;
 
     public ObservedValue(LocalDateTime localDateTime, double value) {
@@ -39,10 +39,31 @@ public class ObservedValue {
     public List<ObservedTagsAndFlags> getTagsAndFlags() {
         return tagsAndFlags;
     }
-    
+
+    public Double getNewUnitPriceIfChanged() {
+        for (int i = tagsAndFlags.size() - 1; i >= 0; i--) {
+            ObservedTagsAndFlags tag = tagsAndFlags.get(i);
+            if (tag instanceof ObservedTagsAndFlags.UnitPriceChangedJustAfterMeasurementTag) {
+                return ((ObservedTagsAndFlags.UnitPriceChangedJustAfterMeasurementTag) tag).getNewUnitPrice();
+            }
+        }
+        return null;
+    }
+
+    public Double getNewMeterStartValueIfReplaced() {
+        for (int i = tagsAndFlags.size() - 1; i >= 0; i--) {
+            ObservedTagsAndFlags tag = tagsAndFlags.get(i);
+            if (tag instanceof ObservedTagsAndFlags.MeterReplacedJustAfterMeasurementTag) {
+                return ((ObservedTagsAndFlags.MeterReplacedJustAfterMeasurementTag) tag).getMeterStartValue();
+            }
+        }
+        return null;
+    }
+
     public void addTagsAndFlags(ObservedTagsAndFlags tf) {
         if (!tagsAndFlags.contains(tf)) {
             tagsAndFlags.add(tf);
         }
     }
+
 }

@@ -62,6 +62,7 @@ public class Meter {
 
     /**
      * Calculate consumed electrics by selected MeterType.
+     *
      * @return total consumed power
      */
     public double calculateConsumedElectricity() {
@@ -77,11 +78,9 @@ public class Meter {
 
             for (ObservedValue observedValue : observedValues) {
                 lastValue = observedValue.getValue();
-                for (ObservedTagsAndFlags tag : observedValue.getTagsAndFlags()) {
-                    if (tag instanceof ObservedTagsAndFlags.MeterReplacedJustAfterMeasurementTag meterTag) {
-                        totalConsumedPower += lastValue - lastMeterStartValue;
-                        lastMeterStartValue = meterTag.getMeterStartValue();
-                    }
+                if (observedValue.getNewMeterStartValueIfReplaced() != null) {
+                    totalConsumedPower += lastValue - lastMeterStartValue;
+                    lastMeterStartValue = observedValue.getNewMeterStartValueIfReplaced();
                 }
             }
             totalConsumedPower += lastValue - lastMeterStartValue;
@@ -95,33 +94,29 @@ public class Meter {
     }
 
     public double calculateConsumedElectricity(LocalDateTime from, LocalDateTime to) {
-       //Calculate consumed power from selected measurements
+        //Calculate consumed power from selected measurements
         double totalConsumedElectricity = 0.0;
-        
+
         if (observedValues == null || observedValues.isEmpty()) {
             return totalConsumedElectricity;
         }
-        
+
         if (meterType == MeterType.CumulativeValue) {
             double previousValue = 0.0;
             for (ObservedValue observedValue : observedValues) {
-                if(observedValue.getLocalDateTime().compareTo(from) >= 0 && observedValue.getLocalDateTime().compareTo(to) <= 0){
-                    if(previousValue != 0.0){
+                if (observedValue.getLocalDateTime().compareTo(from) >= 0 && observedValue.getLocalDateTime().compareTo(to) <= 0) {
+                    if (previousValue != 0.0) {
                         totalConsumedElectricity += observedValue.getValue() - previousValue;
                     }
                     previousValue = observedValue.getValue();
-                    if(!observedValue.getTagsAndFlags().isEmpty()){
-                        for (ObservedTagsAndFlags tag : observedValue.getTagsAndFlags()) {
-                            if (tag instanceof ObservedTagsAndFlags.MeterReplacedJustAfterMeasurementTag newMeterTag) {
-                                previousValue = newMeterTag.getMeterStartValue();
-                            }
-                        }
-                    }                                                   
+                    if (observedValue.getNewMeterStartValueIfReplaced() != null) {
+                        previousValue = observedValue.getNewMeterStartValueIfReplaced();
+                    }
                 }
             }
-        }else if (meterType == MeterType.ActualValue) {
+        } else if (meterType == MeterType.ActualValue) {
             for (ObservedValue observedValue : observedValues) {
-                if(observedValue.getLocalDateTime().compareTo(from) >= 0 && observedValue.getLocalDateTime().compareTo(to) <= 0){
+                if (observedValue.getLocalDateTime().compareTo(from) >= 0 && observedValue.getLocalDateTime().compareTo(to) <= 0) {
                     totalConsumedElectricity += observedValue.getValue();
                 }
             }
@@ -155,21 +150,13 @@ public class Meter {
 
             totalPrice += consumedElectricity * currentUnitPrice;
 
-            for (ObservedTagsAndFlags tag : observedValue.getTagsAndFlags()) {
-                if (tag instanceof ObservedTagsAndFlags.UnitPriceChangedJustAfterMeasurementTag) {
-                    ObservedTagsAndFlags.UnitPriceChangedJustAfterMeasurementTag priceChangeTag
-                            = (ObservedTagsAndFlags.UnitPriceChangedJustAfterMeasurementTag) tag;
-                    currentUnitPrice = priceChangeTag.getNewUnitPrice();
-                }
-
-                if (tag instanceof ObservedTagsAndFlags.MeterReplacedJustAfterMeasurementTag) {
-                    ObservedTagsAndFlags.MeterReplacedJustAfterMeasurementTag meterReplacementTag
-                            = (ObservedTagsAndFlags.MeterReplacedJustAfterMeasurementTag) tag;
-                    lastValue = meterReplacementTag.getMeterStartValue();
-                }
+            if (observedValue.getNewUnitPriceIfChanged() != null) {
+                currentUnitPrice = observedValue.getNewUnitPriceIfChanged();
+            }
+            if (observedValue.getNewMeterStartValueIfReplaced() != null) {
+                lastValue = observedValue.getNewMeterStartValueIfReplaced();
             }
         }
-
         return totalPrice;
     }
 
