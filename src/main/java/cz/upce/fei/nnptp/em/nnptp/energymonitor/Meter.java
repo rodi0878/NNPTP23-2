@@ -60,13 +60,17 @@ public class Meter {
         this.observedValues = observedValues;
     }
 
+    private boolean isObservedValuesEmpty(){
+        return observedValues == null || observedValues.isEmpty();
+    }
+
     /**
      * Calculate consumed electrics by selected MeterType.
      *
      * @return total consumed power
      */
     public double calculateConsumedElectricity() {
-        if (observedValues == null || observedValues.isEmpty()) {
+        if (isObservedValuesEmpty()) {
             return 0.0;
         }
 
@@ -95,7 +99,7 @@ public class Meter {
         //Calculate consumed power from selected measurements
         double totalConsumedElectricity = 0.0;
 
-        if (observedValues == null || observedValues.isEmpty()) {
+        if (isObservedValuesEmpty()) {
             return totalConsumedElectricity;
         }
 
@@ -127,7 +131,7 @@ public class Meter {
         double currentUnitPrice = energy.getPricePerMeasuredUnit();
         double lastValue = 0.0;
 
-        if (getObservedValues() == null || getObservedValues().isEmpty()) {
+        if (isObservedValuesEmpty()) {
             return 0.0;
         }
 
