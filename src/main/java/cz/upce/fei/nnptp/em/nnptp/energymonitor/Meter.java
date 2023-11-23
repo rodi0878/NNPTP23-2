@@ -15,6 +15,11 @@ public class Meter {
         ActualValue
     }
 
+    private Energy energy;
+    private Distribution distribution;
+    private MeterType meterType;
+    private List<ObservedValue> observedValues;
+
     public Meter(Energy energy, Distribution distribution, MeterType meterType, List<ObservedValue> observedValues) {
         this.energy = energy;
         this.distribution = distribution;
@@ -22,11 +27,6 @@ public class Meter {
         this.observedValues = observedValues;
     }
 
-    private Energy energy;
-    private Distribution distribution;
-    private MeterType meterType;
-
-    private List<ObservedValue> observedValues;
 
     public Energy getEnergy() {
         return energy;
