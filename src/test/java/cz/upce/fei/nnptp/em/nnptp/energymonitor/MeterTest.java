@@ -196,7 +196,7 @@ public class MeterTest {
     
     @Test
     public void testCalculatePriceWithCumulativeMeter() {
-        Energy energy = new Energy(Energy.EnergyType.Electricity);
+        Energy energy = new Energy(Energy.EnergyType.ELECTRICITY);
         energy.setPricePerMeasuredUnit(10.0);
 
         List<ObservedValue> observedValues = new ArrayList<>();
@@ -212,7 +212,7 @@ public class MeterTest {
 
     @Test
     public void testCalculatePriceWithActualMeter() {
-        Energy energy = new Energy(Energy.EnergyType.Gas);
+        Energy energy = new Energy(Energy.EnergyType.GAS);
         energy.setPricePerMeasuredUnit(20.0);
 
         List<ObservedValue> observedValues = new ArrayList<>();
@@ -228,7 +228,7 @@ public class MeterTest {
 
     @Test
     public void testCalculatePriceWithPriceChange() {
-        Energy energy = new Energy(Energy.EnergyType.HotWater);
+        Energy energy = new Energy(Energy.EnergyType.HOT_WATER);
         energy.setPricePerMeasuredUnit(5.0);
         
         List<ObservedValue> observedValues = new ArrayList<>();
@@ -251,7 +251,7 @@ public class MeterTest {
     
     @Test
     public void testCalculatePriceWithPriceAndMeterChange() {
-        Energy energy = new Energy(Energy.EnergyType.HotWater);
+        Energy energy = new Energy(Energy.EnergyType.HOT_WATER);
         energy.setPricePerMeasuredUnit(5.0);
         
         List<ObservedValue> observedValues = new ArrayList<>();
