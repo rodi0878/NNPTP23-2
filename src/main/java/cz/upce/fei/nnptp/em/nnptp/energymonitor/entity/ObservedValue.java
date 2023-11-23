@@ -39,8 +39,10 @@ public class ObservedValue {
     public List<ObservedTagsAndFlags> getTagsAndFlags() {
         return tagsAndFlags;
     }
-
     
-    
-    
+    public void addTagsAndFlags(ObservedTagsAndFlags tf) {
+        if (!tagsAndFlags.contains(tf)) {
+            tagsAndFlags.add(tf);
+        }
+    }
 }
