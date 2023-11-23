@@ -11,8 +11,8 @@ import java.util.List;
 public class Meter {
 
     public static enum MeterType {
-        CumulativeValue,
-        ActualValue
+        CUMULATIVE_VALUE,
+        ACTUAL_VALUE
     }
 
     public Meter(Energy energy, Distribution distribution, MeterType meterType, List<ObservedValue> observedValues) {
@@ -72,7 +72,7 @@ public class Meter {
 
         double totalConsumedPower = 0.0;
 
-        if (meterType == MeterType.CumulativeValue) {
+        if (meterType == MeterType.CUMULATIVE_VALUE) {
             double lastValue = observedValues.get(0).getValue();
             double lastMeterStartValue = lastValue;
 
@@ -84,7 +84,7 @@ public class Meter {
                 }
             }
             totalConsumedPower += lastValue - lastMeterStartValue;
-        } else if (meterType == MeterType.ActualValue) {
+        } else if (meterType == MeterType.ACTUAL_VALUE) {
             totalConsumedPower = observedValues.stream().mapToDouble(ObservedValue::getValue).sum();
         }
 
@@ -99,7 +99,7 @@ public class Meter {
             return totalConsumedElectricity;
         }
 
-        if (meterType == MeterType.CumulativeValue) {
+        if (meterType == MeterType.CUMULATIVE_VALUE) {
             double previousValue = 0.0;
             for (ObservedValue observedValue : observedValues) {
                 if (observedValue.getLocalDateTime().compareTo(from) >= 0 && observedValue.getLocalDateTime().compareTo(to) <= 0) {
@@ -112,7 +112,7 @@ public class Meter {
                     }
                 }
             }
-        } else if (meterType == MeterType.ActualValue) {
+        } else if (meterType == MeterType.ACTUAL_VALUE) {
             for (ObservedValue observedValue : observedValues) {
                 if (observedValue.getLocalDateTime().compareTo(from) >= 0 && observedValue.getLocalDateTime().compareTo(to) <= 0) {
                     totalConsumedElectricity += observedValue.getValue();
@@ -135,7 +135,7 @@ public class Meter {
             ObservedValue observedValue = getObservedValues().get(i);
 
             double consumedElectricity = 0.0;
-            if (meterType == MeterType.CumulativeValue) {
+            if (meterType == MeterType.CUMULATIVE_VALUE) {
                 if (i == 0) {
                     lastValue = observedValue.getValue();
                     continue;
