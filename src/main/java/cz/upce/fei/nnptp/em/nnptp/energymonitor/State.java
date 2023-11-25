@@ -1,5 +1,6 @@
 package cz.upce.fei.nnptp.em.nnptp.energymonitor;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -7,7 +8,7 @@ import java.util.List;
 /**
  *
  */
-public class State {
+public class State implements Serializable {
 
     private final List<ConnectionPoint> connectionPoints;
 
