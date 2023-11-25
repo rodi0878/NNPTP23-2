@@ -1,11 +1,12 @@
 package cz.upce.fei.nnptp.em.nnptp.energymonitor;
 
+import java.io.Serializable;
 import java.util.List;
 
 /**
  * Connection Point - house/flat/land
  */
-public class ConnectionPoint {
+public class ConnectionPoint implements Serializable {
 
     private int id;
     private String address;

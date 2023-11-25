@@ -2,13 +2,15 @@ package cz.upce.fei.nnptp.em.nnptp.energymonitor;
 
 import cz.upce.fei.nnptp.em.nnptp.energymonitor.entity.ObservedTagsAndFlags;
 import cz.upce.fei.nnptp.em.nnptp.energymonitor.entity.ObservedValue;
+
+import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.List;
 
 /**
  *
  */
-public class Meter {
+public class Meter implements Serializable {
 
     public static enum MeterType {
         CumulativeValue,

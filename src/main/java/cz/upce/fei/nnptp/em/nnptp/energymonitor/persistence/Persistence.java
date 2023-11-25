@@ -9,7 +9,7 @@ import java.io.ObjectOutputStream;
  *
  */
 public class Persistence {
-    public void saveState(State state, File file) {
+    public static void saveState(State state, File file) {
         try (FileOutputStream outputStateFile = new FileOutputStream(file)) {
             ObjectOutputStream saveStateStream = new ObjectOutputStream(outputStateFile);
             saveStateStream.writeObject(state);

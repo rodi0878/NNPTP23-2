@@ -1,5 +1,6 @@
 package cz.upce.fei.nnptp.em.nnptp.energymonitor.entity;
 
+import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -7,7 +8,7 @@ import java.util.List;
 /**
  *
  */
-public class ObservedValue {
+public class ObservedValue implements Serializable {
 
     private LocalDateTime localDateTime;
     private double value;

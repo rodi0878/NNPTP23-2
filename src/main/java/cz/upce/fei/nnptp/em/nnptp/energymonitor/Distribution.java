@@ -1,9 +1,11 @@
 package cz.upce.fei.nnptp.em.nnptp.energymonitor;
 
+import java.io.Serializable;
+
 /**
  *
  */
-public class Distribution {
+public class Distribution implements Serializable {
 
     private String name;
     private String address;

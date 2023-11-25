@@ -1,9 +1,11 @@
 package cz.upce.fei.nnptp.em.nnptp.energymonitor;
 
+import java.io.Serializable;
+
 /**
  *
  */
-public class Energy {
+public class Energy implements Serializable {
 
     public static enum EnergyType {
         ELECTRICITY,

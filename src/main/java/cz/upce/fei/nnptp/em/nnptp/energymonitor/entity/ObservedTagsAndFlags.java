@@ -1,9 +1,11 @@
 package cz.upce.fei.nnptp.em.nnptp.energymonitor.entity;
 
+import java.io.Serializable;
+
 /**
  *
  */
-public abstract class ObservedTagsAndFlags {
+public abstract class ObservedTagsAndFlags implements Serializable {
 
     public static class MeterReplacedJustAfterMeasurementTag extends ObservedTagsAndFlags {
 
