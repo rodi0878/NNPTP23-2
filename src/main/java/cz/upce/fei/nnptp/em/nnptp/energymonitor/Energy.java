@@ -14,6 +14,12 @@ public class Energy {
     }
 
     private String name;
+    private EnergyType energyType;
+    private double pricePerMeasuredUnit; // TODO move to initial price tag to observed values ?
+
+    public Energy(EnergyType energyType) {
+        this.energyType = energyType;
+    }
 
     public String getName() {
         return name;
@@ -21,12 +27,6 @@ public class Energy {
 
     public void setName(String name) {
         this.name = name;
-    }
-    private EnergyType energyType;
-    private double pricePerMeasuredUnit; // TODO move to initial price tag to observed values ?
-
-    public Energy(EnergyType energyType) {
-        this.energyType = energyType;
     }
 
     public EnergyType getEnergyType() {

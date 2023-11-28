@@ -11,9 +11,14 @@ import java.util.List;
 public class Meter {
 
     public static enum MeterType {
-        CumulativeValue,
-        ActualValue
+        CUMULATIVE_VALUE,
+        ACTUAL_VALUE
     }
+
+    private Energy energy;
+    private Distribution distribution;
+    private MeterType meterType;
+    private List<ObservedValue> observedValues;
 
     public Meter(Energy energy, Distribution distribution, MeterType meterType, List<ObservedValue> observedValues) {
         this.energy = energy;
@@ -22,11 +27,6 @@ public class Meter {
         this.observedValues = observedValues;
     }
 
-    private Energy energy;
-    private Distribution distribution;
-    private MeterType meterType;
-
-    private List<ObservedValue> observedValues;
 
     public Energy getEnergy() {
         return energy;
@@ -60,19 +60,23 @@ public class Meter {
         this.observedValues = observedValues;
     }
 
+    private boolean isObservedValuesEmpty(){
+        return observedValues == null || observedValues.isEmpty();
+    }
+
     /**
      * Calculate consumed electrics by selected MeterType.
      *
      * @return total consumed power
      */
     public double calculateConsumedElectricity() {
-        if (observedValues == null || observedValues.isEmpty()) {
+        if (isObservedValuesEmpty()) {
             return 0.0;
         }
 
         double totalConsumedPower = 0.0;
 
-        if (meterType == MeterType.CumulativeValue) {
+        if (meterType == MeterType.CUMULATIVE_VALUE) {
             double lastValue = observedValues.get(0).getValue();
             double lastMeterStartValue = lastValue;
 
@@ -84,7 +88,7 @@ public class Meter {
                 }
             }
             totalConsumedPower += lastValue - lastMeterStartValue;
-        } else if (meterType == MeterType.ActualValue) {
+        } else if (meterType == MeterType.ACTUAL_VALUE) {
             totalConsumedPower = observedValues.stream().mapToDouble(ObservedValue::getValue).sum();
         }
 
@@ -95,11 +99,11 @@ public class Meter {
         //Calculate consumed power from selected measurements
         double totalConsumedElectricity = 0.0;
 
-        if (observedValues == null || observedValues.isEmpty()) {
+        if (isObservedValuesEmpty()) {
             return totalConsumedElectricity;
         }
 
-        if (meterType == MeterType.CumulativeValue) {
+        if (meterType == MeterType.CUMULATIVE_VALUE) {
             double previousValue = 0.0;
             for (ObservedValue observedValue : observedValues) {
                 if (observedValue.getLocalDateTime().isAfter(from) && observedValue.getLocalDateTime().isBefore(to)) {
@@ -112,7 +116,7 @@ public class Meter {
                     }
                 }
             }
-        } else if (meterType == MeterType.ActualValue) {
+        } else if (meterType == MeterType.ACTUAL_VALUE) {
             for (ObservedValue observedValue : observedValues) {
                 if (observedValue.getLocalDateTime().isAfter(from) && observedValue.getLocalDateTime().isBefore(to)) {
                     totalConsumedElectricity += observedValue.getValue();
@@ -127,7 +131,7 @@ public class Meter {
         double currentUnitPrice = energy.getPricePerMeasuredUnit();
         double lastValue = 0.0;
 
-        if (getObservedValues() == null || getObservedValues().isEmpty()) {
+        if (isObservedValuesEmpty()) {
             return 0.0;
         }
 
@@ -135,7 +139,7 @@ public class Meter {
             ObservedValue observedValue = getObservedValues().get(i);
 
             double consumedElectricity = 0.0;
-            if (meterType == MeterType.CumulativeValue) {
+            if (meterType == MeterType.CUMULATIVE_VALUE) {
                 if (i == 0) {
                     lastValue = observedValue.getValue();
                     continue;
