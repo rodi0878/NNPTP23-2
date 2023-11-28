@@ -106,7 +106,7 @@ public class Meter {
         if (meterType == MeterType.CUMULATIVE_VALUE) {
             double previousValue = 0.0;
             for (ObservedValue observedValue : observedValues) {
-                if (observedValue.getLocalDateTime().compareTo(from) >= 0 && observedValue.getLocalDateTime().compareTo(to) <= 0) {
+                if (!(observedValue.getLocalDateTime().isBefore(from) || observedValue.getLocalDateTime().isAfter(to))) {
                     if (previousValue != 0.0) {
                         totalConsumedElectricity += observedValue.getValue() - previousValue;
                     }
@@ -118,7 +118,7 @@ public class Meter {
             }
         } else if (meterType == MeterType.ACTUAL_VALUE) {
             for (ObservedValue observedValue : observedValues) {
-                if (observedValue.getLocalDateTime().compareTo(from) >= 0 && observedValue.getLocalDateTime().compareTo(to) <= 0) {
+                if (!(observedValue.getLocalDateTime().isBefore(from) || observedValue.getLocalDateTime().isAfter(to))) {
                     totalConsumedElectricity += observedValue.getValue();
                 }
             }
