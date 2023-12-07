@@ -79,23 +79,26 @@ public class Meter {
      * @return total consumed power
      */
     public double calculateConsumedElectricity() {
+        if (isObservedValuesEmpty()) {
+            return 0.0;
+        }
+
         double totalConsumedPower = 0.0;
 
         switch (meterType) {
             case CUMULATIVE_VALUE:
-                if (!isObservedValuesEmpty()) {
-                    double lastValue = observedValues.get(0).getValue();
-                    double lastMeterStartValue = lastValue;
 
-                    for (ObservedValue observedValue : observedValues) {
-                        lastValue = observedValue.getValue();
-                        if (observedValue.getNewMeterStartValueIfReplaced() != null) {
-                            totalConsumedPower += lastValue - lastMeterStartValue;
-                            lastMeterStartValue = observedValue.getNewMeterStartValueIfReplaced();
-                        }
+                double lastValue = observedValues.get(0).getValue();
+                double lastMeterStartValue = lastValue;
+
+                for (ObservedValue observedValue : observedValues) {
+                    lastValue = observedValue.getValue();
+                    if (observedValue.getNewMeterStartValueIfReplaced() != null) {
+                        totalConsumedPower += lastValue - lastMeterStartValue;
+                        lastMeterStartValue = observedValue.getNewMeterStartValueIfReplaced();
                     }
-                    totalConsumedPower += lastValue - lastMeterStartValue;
                 }
+                totalConsumedPower += lastValue - lastMeterStartValue;
                 break;
 
             case ACTUAL_VALUE:
