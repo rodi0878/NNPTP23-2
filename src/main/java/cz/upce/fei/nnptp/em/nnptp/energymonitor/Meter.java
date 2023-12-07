@@ -1,5 +1,7 @@
 package cz.upce.fei.nnptp.em.nnptp.energymonitor;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+import cz.upce.fei.nnptp.em.nnptp.energymonitor.entity.ObservedTagsAndFlags;
 import cz.upce.fei.nnptp.em.nnptp.energymonitor.entity.ObservedValue;
 
 import java.time.LocalDateTime;
@@ -15,12 +17,19 @@ public class Meter {
         ACTUAL_VALUE
     }
 
+    @JsonProperty("energy")
     private Energy energy;
+
+    @JsonProperty("distribution")
     private Distribution distribution;
+
+    @JsonProperty("meterType")
     private MeterType meterType;
+
+    @JsonProperty("observedValues")
     private List<ObservedValue> observedValues;
 
-    public Meter(Energy energy, Distribution distribution, MeterType meterType, List<ObservedValue> observedValues) {
+    public Meter(@JsonProperty("energy") Energy energy, @JsonProperty("distribution") Distribution distribution, @JsonProperty("meterType") MeterType meterType, @JsonProperty("observedValues") List<ObservedValue> observedValues) {
         this.energy = energy;
         this.distribution = distribution;
         this.meterType = meterType;
