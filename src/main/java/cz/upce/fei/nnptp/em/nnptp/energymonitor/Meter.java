@@ -3,6 +3,7 @@ package cz.upce.fei.nnptp.em.nnptp.energymonitor;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import cz.upce.fei.nnptp.em.nnptp.energymonitor.entity.ObservedTagsAndFlags;
 import cz.upce.fei.nnptp.em.nnptp.energymonitor.entity.ObservedValue;
+
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -135,6 +136,10 @@ public class Meter {
     }
 
     public double calculatePrice() {
+        return calculatePrice(null, null);
+    }
+
+    public double calculatePrice(LocalDateTime from, LocalDateTime to) {
         double totalPrice = 0.0;
         double currentUnitPrice = energy.getPricePerMeasuredUnit();
         double lastValue = 0.0;
@@ -143,8 +148,10 @@ public class Meter {
             return 0.0;
         }
 
-        for (int i = 0; i < getObservedValues().size(); i++) {
-            ObservedValue observedValue = getObservedValues().get(i);
+        List<ObservedValue> observedValuesInTimeInterval = getObservedValuesInTimeInterval(from, to);
+
+        for (int i = 0; i < observedValuesInTimeInterval.size(); i++) {
+            ObservedValue observedValue = observedValuesInTimeInterval.get(i);
 
             double consumedElectricity = 0.0;
             if (meterType == MeterType.CUMULATIVE_VALUE) {
@@ -170,10 +177,29 @@ public class Meter {
         return totalPrice;
     }
 
-    public double calculatePrice(LocalDateTime from, LocalDateTime to) {
-        // TODO
-        throw new RuntimeException();
+    private List<ObservedValue> getObservedValuesInTimeInterval(LocalDateTime from, LocalDateTime to) {
+        List<ObservedValue> observedValuesInTimeInterval;
+        if (from == null && to == null) {
+            observedValuesInTimeInterval = observedValues;
+        } else {
+            observedValuesInTimeInterval = observedValues.stream()
+                    .filter((observedValue) -> isValueInTimeInterval(from, to, observedValue))
+                    .toList();
+        }
+        return observedValuesInTimeInterval;
+    }
 
+    private boolean isValueInTimeInterval(LocalDateTime from, LocalDateTime to, ObservedValue observedValue) {
+        if (from == null && to == null) {
+            return true;
+        } else if (to == null) {
+            return observedValue.getLocalDateTime().isAfter(from) || observedValue.getLocalDateTime().isEqual(from);
+        } else if (from == null) {
+            return observedValue.getLocalDateTime().isBefore(to) || observedValue.getLocalDateTime().isEqual(to);
+        } else {
+            return (observedValue.getLocalDateTime().isAfter(from) || observedValue.getLocalDateTime().isEqual(from)) &&
+                    (observedValue.getLocalDateTime().isBefore(to) || observedValue.getLocalDateTime().isEqual(to));
+        }
     }
 
 }
