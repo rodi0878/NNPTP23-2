@@ -1,5 +1,7 @@
 package cz.upce.fei.nnptp.em.nnptp.energymonitor;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -9,6 +11,7 @@ import java.util.List;
  */
 public class State {
 
+    @JsonProperty("connectionPoints")
     private final List<ConnectionPoint> connectionPoints;
 
     public State() {
