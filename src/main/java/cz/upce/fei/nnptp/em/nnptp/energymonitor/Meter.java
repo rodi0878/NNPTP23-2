@@ -1,7 +1,6 @@
 package cz.upce.fei.nnptp.em.nnptp.energymonitor;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import cz.upce.fei.nnptp.em.nnptp.energymonitor.entity.ObservedTagsAndFlags;
 import cz.upce.fei.nnptp.em.nnptp.energymonitor.entity.ObservedValue;
 
 import java.time.LocalDateTime;
@@ -69,7 +68,7 @@ public class Meter {
         this.observedValues = observedValues;
     }
 
-    private boolean isObservedValuesEmpty(){
+    private boolean isObservedValuesEmpty() {
         return observedValues == null || observedValues.isEmpty();
     }
 
@@ -145,20 +144,20 @@ public class Meter {
     }
 
     public double calculatePrice(LocalDateTime from, LocalDateTime to) {
-        double totalPrice = 0.0;
-        double currentUnitPrice = energy.getPricePerMeasuredUnit();
-        double lastValue = 0.0;
-
         if (isObservedValuesEmpty()) {
             return 0.0;
         }
+
+        double currentUnitPrice = energy.getPricePerMeasuredUnit();
+        double totalPrice = 0.0;
+        double lastValue = 0.0;
 
         List<ObservedValue> observedValuesInTimeInterval = getObservedValuesInTimeInterval(from, to);
 
         for (int i = 0; i < observedValuesInTimeInterval.size(); i++) {
             ObservedValue observedValue = observedValuesInTimeInterval.get(i);
+            double consumedElectricity = observedValue.getValue();
 
-            double consumedElectricity = 0.0;
             if (meterType == MeterType.CUMULATIVE_VALUE) {
                 if (i == 0) {
                     lastValue = observedValue.getValue();
@@ -166,8 +165,6 @@ public class Meter {
                 }
                 consumedElectricity = observedValue.getValue() - lastValue;
                 lastValue = observedValue.getValue();
-            } else {
-                consumedElectricity = observedValue.getValue();
             }
 
             totalPrice += consumedElectricity * currentUnitPrice;
@@ -183,28 +180,16 @@ public class Meter {
     }
 
     private List<ObservedValue> getObservedValuesInTimeInterval(LocalDateTime from, LocalDateTime to) {
-        List<ObservedValue> observedValuesInTimeInterval;
-        if (from == null && to == null) {
-            observedValuesInTimeInterval = observedValues;
-        } else {
-            observedValuesInTimeInterval = observedValues.stream()
-                    .filter((observedValue) -> isValueInTimeInterval(from, to, observedValue))
-                    .toList();
-        }
-        return observedValuesInTimeInterval;
+        return observedValues.stream()
+                .filter(observedValue -> isValueInTimeInterval(from, to, observedValue))
+                .toList();
     }
 
     private boolean isValueInTimeInterval(LocalDateTime from, LocalDateTime to, ObservedValue observedValue) {
-        if (from == null && to == null) {
-            return true;
-        } else if (to == null) {
-            return observedValue.getLocalDateTime().isAfter(from) || observedValue.getLocalDateTime().isEqual(from);
-        } else if (from == null) {
-            return observedValue.getLocalDateTime().isBefore(to) || observedValue.getLocalDateTime().isEqual(to);
-        } else {
-            return (observedValue.getLocalDateTime().isAfter(from) || observedValue.getLocalDateTime().isEqual(from)) &&
-                    (observedValue.getLocalDateTime().isBefore(to) || observedValue.getLocalDateTime().isEqual(to));
-        }
+        LocalDateTime valueDateTime = observedValue.getLocalDateTime();
+        boolean isFromAfterOrEqual = from == null || valueDateTime.isEqual(from) || valueDateTime.isAfter(from);
+        boolean isToBeforeOrEqual = to == null || valueDateTime.isEqual(to) || valueDateTime.isBefore(to);
+        return isFromAfterOrEqual && isToBeforeOrEqual;
     }
 
 }
