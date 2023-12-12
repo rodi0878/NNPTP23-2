@@ -85,20 +85,25 @@ public class Meter {
 
         double totalConsumedPower = 0.0;
 
-        if (meterType == MeterType.CUMULATIVE_VALUE) {
-            double lastValue = observedValues.get(0).getValue();
-            double lastMeterStartValue = lastValue;
+        switch (meterType) {
+            case CUMULATIVE_VALUE:
 
-            for (ObservedValue observedValue : observedValues) {
-                lastValue = observedValue.getValue();
-                if (observedValue.getNewMeterStartValueIfReplaced() != null) {
-                    totalConsumedPower += lastValue - lastMeterStartValue;
-                    lastMeterStartValue = observedValue.getNewMeterStartValueIfReplaced();
+                double lastValue = observedValues.get(0).getValue();
+                double lastMeterStartValue = lastValue;
+
+                for (ObservedValue observedValue : observedValues) {
+                    lastValue = observedValue.getValue();
+                    if (observedValue.getNewMeterStartValueIfReplaced() != null) {
+                        totalConsumedPower += lastValue - lastMeterStartValue;
+                        lastMeterStartValue = observedValue.getNewMeterStartValueIfReplaced();
+                    }
                 }
-            }
-            totalConsumedPower += lastValue - lastMeterStartValue;
-        } else if (meterType == MeterType.ACTUAL_VALUE) {
-            totalConsumedPower = observedValues.stream().mapToDouble(ObservedValue::getValue).sum();
+                totalConsumedPower += lastValue - lastMeterStartValue;
+                break;
+
+            case ACTUAL_VALUE:
+                totalConsumedPower = observedValues.stream().mapToDouble(ObservedValue::getValue).sum();
+                break;
         }
 
         return totalConsumedPower;
