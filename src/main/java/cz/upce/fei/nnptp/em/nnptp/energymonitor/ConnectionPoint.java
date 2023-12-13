@@ -1,5 +1,7 @@
 package cz.upce.fei.nnptp.em.nnptp.energymonitor;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import java.util.List;
 
 /**
@@ -7,12 +9,16 @@ import java.util.List;
  */
 public class ConnectionPoint {
 
+    @JsonProperty("id")
     private int id;
+
+    @JsonProperty("address")
     private String address;
-    
+
+    @JsonProperty("meters")
     private List<Meter> meters;
 
-    public ConnectionPoint(int id, String address, List<Meter> meters) {
+    public ConnectionPoint(@JsonProperty("id") int id, @JsonProperty("address") String address, @JsonProperty("meters") List<Meter> meters) {
         this.id = id;
         this.address = address;
         this.meters = meters;

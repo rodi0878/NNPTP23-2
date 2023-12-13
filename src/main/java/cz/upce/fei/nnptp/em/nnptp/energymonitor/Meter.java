@@ -1,7 +1,8 @@
 package cz.upce.fei.nnptp.em.nnptp.energymonitor;
 
-import cz.upce.fei.nnptp.em.nnptp.energymonitor.entity.ObservedTagsAndFlags;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import cz.upce.fei.nnptp.em.nnptp.energymonitor.entity.ObservedValue;
+
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -15,12 +16,19 @@ public class Meter {
         ACTUAL_VALUE
     }
 
+    @JsonProperty("energy")
     private Energy energy;
+
+    @JsonProperty("distribution")
     private Distribution distribution;
+
+    @JsonProperty("meterType")
     private MeterType meterType;
+
+    @JsonProperty("observedValues")
     private List<ObservedValue> observedValues;
 
-    public Meter(Energy energy, Distribution distribution, MeterType meterType, List<ObservedValue> observedValues) {
+    public Meter(@JsonProperty("energy") Energy energy, @JsonProperty("distribution") Distribution distribution, @JsonProperty("meterType") MeterType meterType, @JsonProperty("observedValues") List<ObservedValue> observedValues) {
         this.energy = energy;
         this.distribution = distribution;
         this.meterType = meterType;
@@ -60,7 +68,7 @@ public class Meter {
         this.observedValues = observedValues;
     }
 
-    private boolean isObservedValuesEmpty(){
+    private boolean isObservedValuesEmpty() {
         return observedValues == null || observedValues.isEmpty();
     }
 
@@ -76,20 +84,25 @@ public class Meter {
 
         double totalConsumedPower = 0.0;
 
-        if (meterType == MeterType.CUMULATIVE_VALUE) {
-            double lastValue = observedValues.get(0).getValue();
-            double lastMeterStartValue = lastValue;
+        switch (meterType) {
+            case CUMULATIVE_VALUE:
 
-            for (ObservedValue observedValue : observedValues) {
-                lastValue = observedValue.getValue();
-                if (observedValue.getNewMeterStartValueIfReplaced() != null) {
-                    totalConsumedPower += lastValue - lastMeterStartValue;
-                    lastMeterStartValue = observedValue.getNewMeterStartValueIfReplaced();
+                double lastValue = observedValues.get(0).getValue();
+                double lastMeterStartValue = lastValue;
+
+                for (ObservedValue observedValue : observedValues) {
+                    lastValue = observedValue.getValue();
+                    if (observedValue.getNewMeterStartValueIfReplaced() != null) {
+                        totalConsumedPower += lastValue - lastMeterStartValue;
+                        lastMeterStartValue = observedValue.getNewMeterStartValueIfReplaced();
+                    }
                 }
-            }
-            totalConsumedPower += lastValue - lastMeterStartValue;
-        } else if (meterType == MeterType.ACTUAL_VALUE) {
-            totalConsumedPower = observedValues.stream().mapToDouble(ObservedValue::getValue).sum();
+                totalConsumedPower += lastValue - lastMeterStartValue;
+                break;
+
+            case ACTUAL_VALUE:
+                totalConsumedPower = observedValues.stream().mapToDouble(ObservedValue::getValue).sum();
+                break;
         }
 
         return totalConsumedPower;
@@ -127,18 +140,24 @@ public class Meter {
     }
 
     public double calculatePrice() {
-        double totalPrice = 0.0;
-        double currentUnitPrice = energy.getPricePerMeasuredUnit();
-        double lastValue = 0.0;
+        return calculatePrice(null, null);
+    }
 
+    public double calculatePrice(LocalDateTime from, LocalDateTime to) {
         if (isObservedValuesEmpty()) {
             return 0.0;
         }
 
-        for (int i = 0; i < getObservedValues().size(); i++) {
-            ObservedValue observedValue = getObservedValues().get(i);
+        double currentUnitPrice = energy.getPricePerMeasuredUnit();
+        double totalPrice = 0.0;
+        double lastValue = 0.0;
 
-            double consumedElectricity = 0.0;
+        List<ObservedValue> observedValuesInTimeInterval = getObservedValuesInTimeInterval(from, to);
+
+        for (int i = 0; i < observedValuesInTimeInterval.size(); i++) {
+            ObservedValue observedValue = observedValuesInTimeInterval.get(i);
+            double consumedElectricity = observedValue.getValue();
+
             if (meterType == MeterType.CUMULATIVE_VALUE) {
                 if (i == 0) {
                     lastValue = observedValue.getValue();
@@ -146,8 +165,6 @@ public class Meter {
                 }
                 consumedElectricity = observedValue.getValue() - lastValue;
                 lastValue = observedValue.getValue();
-            } else {
-                consumedElectricity = observedValue.getValue();
             }
 
             totalPrice += consumedElectricity * currentUnitPrice;
@@ -162,10 +179,17 @@ public class Meter {
         return totalPrice;
     }
 
-    public double calculatePrice(LocalDateTime from, LocalDateTime to) {
-        // TODO
-        throw new RuntimeException();
+    private List<ObservedValue> getObservedValuesInTimeInterval(LocalDateTime from, LocalDateTime to) {
+        return observedValues.stream()
+                .filter(observedValue -> isValueInTimeInterval(from, to, observedValue))
+                .toList();
+    }
 
+    private boolean isValueInTimeInterval(LocalDateTime from, LocalDateTime to, ObservedValue observedValue) {
+        LocalDateTime valueDateTime = observedValue.getLocalDateTime();
+        boolean isFromAfterOrEqual = from == null || valueDateTime.isEqual(from) || valueDateTime.isAfter(from);
+        boolean isToBeforeOrEqual = to == null || valueDateTime.isEqual(to) || valueDateTime.isBefore(to);
+        return isFromAfterOrEqual && isToBeforeOrEqual;
     }
 
 }
