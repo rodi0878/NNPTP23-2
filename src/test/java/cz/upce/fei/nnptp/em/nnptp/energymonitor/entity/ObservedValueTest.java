@@ -18,7 +18,7 @@ public class ObservedValueTest {
     ObservedValue testValue= null;
     
     @BeforeEach
-    void setUp(){
+    public void setUp(){
         testValue = new ObservedValue(LocalDateTime.now(), 100);
     }
     
