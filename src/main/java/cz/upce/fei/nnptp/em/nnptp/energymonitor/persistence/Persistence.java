@@ -10,15 +10,17 @@ import java.io.IOException;
  *
  */
 public class Persistence {
-    public static void saveState(State state, File file) throws IOException {
+    private static ObjectMapper createObjectMapper() {
         ObjectMapper mapper = new ObjectMapper();
         mapper.registerModule(new JavaTimeModule());
-        mapper.writeValue(file, state);
+        return mapper;
+    }
+
+    public static void saveState(State state, File file) throws IOException {
+        createObjectMapper().writeValue(file, state);
     }
 
     public static State loadState(File file) throws IOException {
-        ObjectMapper mapper = new ObjectMapper();
-        mapper.registerModule(new JavaTimeModule());
-        return mapper.readValue(file, State.class);
+        return createObjectMapper().readValue(file, State.class);
     }
 }

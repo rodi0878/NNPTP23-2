@@ -78,64 +78,35 @@ public class Meter {
      * @return total consumed power
      */
     public double calculateConsumedElectricity() {
-        if (isObservedValuesEmpty()) {
-            return 0.0;
-        }
-
-        double totalConsumedPower = 0.0;
-
-        switch (meterType) {
-            case CUMULATIVE_VALUE:
-
-                double lastValue = observedValues.get(0).getValue();
-                double lastMeterStartValue = lastValue;
-
-                for (ObservedValue observedValue : observedValues) {
-                    lastValue = observedValue.getValue();
-                    if (observedValue.getNewMeterStartValueIfReplaced() != null) {
-                        totalConsumedPower += lastValue - lastMeterStartValue;
-                        lastMeterStartValue = observedValue.getNewMeterStartValueIfReplaced();
-                    }
-                }
-                totalConsumedPower += lastValue - lastMeterStartValue;
-                break;
-
-            case ACTUAL_VALUE:
-                totalConsumedPower = observedValues.stream().mapToDouble(ObservedValue::getValue).sum();
-                break;
-        }
-
-        return totalConsumedPower;
+        return calculateConsumedElectricity(null, null);
     }
 
     public double calculateConsumedElectricity(LocalDateTime from, LocalDateTime to) {
         //Calculate consumed power from selected measurements
-        double totalConsumedElectricity = 0.0;
-
         if (isObservedValuesEmpty()) {
-            return totalConsumedElectricity;
+            return 0.0;
         }
 
-        if (meterType == MeterType.CUMULATIVE_VALUE) {
-            double previousValue = 0.0;
-            for (ObservedValue observedValue : observedValues) {
-                if (observedValue.getLocalDateTime().compareTo(from) >= 0 && observedValue.getLocalDateTime().compareTo(to) <= 0) {
-                    if (previousValue != 0.0) {
-                        totalConsumedElectricity += observedValue.getValue() - previousValue;
-                    }
-                    previousValue = observedValue.getValue();
-                    if (observedValue.getNewMeterStartValueIfReplaced() != null) {
-                        previousValue = observedValue.getNewMeterStartValueIfReplaced();
-                    }
+        double totalConsumedElectricity = 0.0;
+        double previousValue = 0.0;
+        List<ObservedValue> observedValuesInTimeInterval = getObservedValuesInTimeInterval(from, to);
+
+        for (int i = 0; i < observedValuesInTimeInterval.size(); i++) {
+            ObservedValue observedValue = observedValuesInTimeInterval.get(i);
+
+            if (meterType == MeterType.CUMULATIVE_VALUE) {
+                if (previousValue != 0.0) {
+                    totalConsumedElectricity += observedValue.getValue() - previousValue;
                 }
-            }
-        } else if (meterType == MeterType.ACTUAL_VALUE) {
-            for (ObservedValue observedValue : observedValues) {
-                if (observedValue.getLocalDateTime().compareTo(from) >= 0 && observedValue.getLocalDateTime().compareTo(to) <= 0) {
-                    totalConsumedElectricity += observedValue.getValue();
+                previousValue = observedValue.getValue();
+                if (observedValue.getNewMeterStartValueIfReplaced() != null) {
+                    previousValue = observedValue.getNewMeterStartValueIfReplaced();
                 }
+            } else {
+                totalConsumedElectricity += observedValue.getValue();
             }
         }
+
         return totalConsumedElectricity;
     }
 
