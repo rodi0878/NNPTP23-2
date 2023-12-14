@@ -15,7 +15,7 @@ import org.junit.jupiter.api.Test;
  */
 public class ObservedValueTest {
 
-    ObservedValue testValue;
+    ObservedValue testValue= null;
     
     @BeforeEach
     void setUp(){
