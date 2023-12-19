@@ -334,14 +334,5 @@ public class MeterTest {
         double expectedPrice = 200.0;
         assertEquals(expectedPrice, meter.calculatePrice(null, to));
     }
-
-    public void testAddToTAgsAndFlags() {
-        ObservedValue observedValue = new ObservedValue(LocalDateTime.now(), 50.0);
-        observedValue.addTagsAndFlags(new ObservedTagsAndFlags.MeterReplacedJustAfterMeasurementTag(
-                "newMeterId2", 10.0));
-        observedValue.addTagsAndFlags(new ObservedTagsAndFlags.UnitPriceChangedJustAfterMeasurementTag(10.0));
-
-        double listSize = observedValue.getTagsAndFlags().size();
-        assertEquals(2, listSize);
-    }
+    
 }
