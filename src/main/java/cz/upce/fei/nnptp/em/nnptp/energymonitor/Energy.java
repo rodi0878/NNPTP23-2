@@ -1,5 +1,6 @@
 package cz.upce.fei.nnptp.em.nnptp.energymonitor;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
@@ -28,7 +29,7 @@ public class Energy {
         this.energyType = energyType;
     }
 
-    public Energy(@JsonProperty("energyType") EnergyType energyType, @JsonProperty("pricePerMeasuredUnit") double pricePerMeasuredUnit) {
+    public Energy(EnergyType energyType, double pricePerMeasuredUnit) {
         this.energyType = energyType;
         this.pricePerMeasuredUnit = pricePerMeasuredUnit;
     }
