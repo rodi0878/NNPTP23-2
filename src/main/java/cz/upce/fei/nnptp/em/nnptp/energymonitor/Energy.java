@@ -28,6 +28,11 @@ public class Energy {
         this.energyType = energyType;
     }
 
+    public Energy(@JsonProperty("energyType") EnergyType energyType, @JsonProperty("pricePerMeasuredUnit") double pricePerMeasuredUnit) {
+        this.energyType = energyType;
+        this.pricePerMeasuredUnit = pricePerMeasuredUnit;
+    }
+
     public String getName() {
         return name;
     }
@@ -51,8 +56,6 @@ public class Energy {
     public void setPricePerMeasuredUnit(double pricePerMeasuredUnit) {
         this.pricePerMeasuredUnit = pricePerMeasuredUnit;
     }
-    
-    
-    
-    
+
+
 }
