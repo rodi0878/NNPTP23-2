@@ -48,7 +48,7 @@ public class ObservedValue {
 
     @JsonIgnore
     public Double getNewUnitPriceIfChanged() {
-        for (int i = tagsAndFlags.size() - 1; i >= 0; i--) {
+        for (int i = 0; i < tagsAndFlags.size(); i++) {
             ObservedTagsAndFlags tag = tagsAndFlags.get(i);
             if (tag instanceof ObservedTagsAndFlags.UnitPriceChangedJustAfterMeasurementTag) {
                 return ((ObservedTagsAndFlags.UnitPriceChangedJustAfterMeasurementTag) tag).getNewUnitPrice();
@@ -59,7 +59,7 @@ public class ObservedValue {
 
     @JsonIgnore
     public Double getNewMeterStartValueIfReplaced() {
-        for (int i = tagsAndFlags.size() - 1; i >= 0; i--) {
+        for (int i = 0; i < tagsAndFlags.size(); i++) {
             ObservedTagsAndFlags tag = tagsAndFlags.get(i);
             if (tag instanceof ObservedTagsAndFlags.MeterReplacedJustAfterMeasurementTag) {
                 return ((ObservedTagsAndFlags.MeterReplacedJustAfterMeasurementTag) tag).getMeterStartValue();
