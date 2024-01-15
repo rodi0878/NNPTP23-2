@@ -30,7 +30,7 @@ public class ObservedValueTagsAndFlagsTest {
     @Test
     public void testAddToTagsAndFlags() {
         observedValue.addTagsAndFlags(new ObservedTagsAndFlags.MeterReplacedJustAfterMeasurementTag(
-                "newMeterId2", 10.0));
+                "M2", 10.0));
         observedValue.addTagsAndFlags(new ObservedTagsAndFlags.UnitPriceChangedJustAfterMeasurementTag(10.0));
 
         double listSize = observedValue.getTagsAndFlags().size();
@@ -48,7 +48,7 @@ public class ObservedValueTagsAndFlagsTest {
     @Test
     public void testGetNewMeterStartValueIfReplaced() {
         observedValue.addTagsAndFlags(new ObservedTagsAndFlags.MeterReplacedJustAfterMeasurementTag(
-                "newMeterId2", 25.0));
+                "M2", 25.0));
 
         double actualStartValue = observedValue.getNewMeterStartValueIfReplaced();
         assertEquals(25, actualStartValue);

@@ -6,6 +6,8 @@ package cz.upce.fei.nnptp.em.nnptp.energymonitor.entity;
 
 import java.time.LocalDateTime;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -17,20 +19,20 @@ public class ObservedValueTest {
 
 
     ObservedValue testValue= null;
-    
+
     @BeforeEach
     public void setUp(){
         testValue = new ObservedValue(LocalDateTime.now(), 100);
     }
-    
+
     @Test
     public void testGetNewUnitPriceIfChangedWithNoTags() {
-        assertEquals(null, testValue.getNewUnitPriceIfChanged());
+        assertNull(testValue.getNewUnitPriceIfChanged());
     }
 
     @Test
     public void testGetNewMeterStartValueIfReplacedWithNoTags() {
-        assertEquals(null, testValue.getNewMeterStartValueIfReplaced());
+        assertNull(testValue.getNewMeterStartValueIfReplaced());
     }
 
     @Test
@@ -45,8 +47,8 @@ public class ObservedValueTest {
 
     @Test
     public void testGetNewMeterStartValueIfReplacedWithActualTags() {
-        ObservedTagsAndFlags meterChange1 = new ObservedTagsAndFlags.MeterReplacedJustAfterMeasurementTag("ID001", 50);
-        ObservedTagsAndFlags meterChange2 = new ObservedTagsAndFlags.MeterReplacedJustAfterMeasurementTag("ID002", 75);
+        ObservedTagsAndFlags meterChange1 = new ObservedTagsAndFlags.MeterReplacedJustAfterMeasurementTag("M1", 50);
+        ObservedTagsAndFlags meterChange2 = new ObservedTagsAndFlags.MeterReplacedJustAfterMeasurementTag("M2", 75);
         testValue.getTagsAndFlags().add(meterChange1);
         testValue.getTagsAndFlags().add(meterChange2);
 

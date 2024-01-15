@@ -2,337 +2,225 @@ package cz.upce.fei.nnptp.em.nnptp.energymonitor;
 
 import cz.upce.fei.nnptp.em.nnptp.energymonitor.entity.ObservedTagsAndFlags;
 import cz.upce.fei.nnptp.em.nnptp.energymonitor.entity.ObservedValue;
+
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+
 import org.junit.jupiter.api.Test;
+
 import static org.junit.jupiter.api.Assertions.*;
 
-/**
- */
 public class MeterTest {
 
-    public MeterTest() {
+    private final LocalDateTime currentTime = LocalDateTime.now();
+
+    private Meter createMeterWithValues(Energy energy, Meter.MeterType meterType) {
+        List<ObservedValue> observedValues = new ArrayList<>(List.of(new ObservedValue(currentTime.minusDays(4), 50.0),
+                                                                     new ObservedValue(currentTime.minusDays(2), 70.5),
+                                                                     new ObservedValue(currentTime, 80.0),
+                                                                     new ObservedValue(currentTime.plusDays(1), 100.5),
+                                                                     new ObservedValue(currentTime.plusDays(4), 150.0),
+                                                                     new ObservedValue(currentTime.plusDays(9), 200.5),
+                                                                     new ObservedValue(currentTime.plusMonths(2), 500.0)));
+        return createMeterWithCustomValues(energy, meterType, observedValues);
+    }
+
+    private Meter createMeterWithCustomValues(Energy energy, Meter.MeterType meterType, List<ObservedValue> observedValues) {
+        return new Meter(energy, null, meterType, observedValues);
     }
 
     @Test
-    public void testCalculateConsumedElectricityInIntervalActual() {
-        List<ObservedValue> list = new ArrayList<>();
-        LocalDateTime time = LocalDateTime.now();
-        list.add(new ObservedValue(time.minusDays(4),5.0));
-        list.add(new ObservedValue(time.minusDays(2),2.6));
-        list.add(new ObservedValue(time,5.5));
-        list.add(new ObservedValue(time.plusDays(1),12.0));
-        list.add(new ObservedValue(time.plusDays(4),9.0));
-        list.add(new ObservedValue(time.plusDays(9),22.6));
-        list.add(new ObservedValue(time.plusMonths(2),56.8));      
-        Meter meter = new Meter(null, new Distribution("Cez", "Praha"), Meter.MeterType.ACTUAL_VALUE, list);
-        
-        double totalConsumedPower = meter.calculateConsumedElectricity(time.minusDays(3), time.plusDays(5));
-        assertEquals(29.1, totalConsumedPower);
+    public void testCalculateConsumedPowerActualInInterval() {
+        Meter meter = createMeterWithValues(null, Meter.MeterType.ACTUAL_VALUE);
+        //70.5 + 80 + 100.5 + 150 = 401
+        assertEquals(401.0, meter.calculateConsumedPower(currentTime.minusDays(3), currentTime.plusDays(5)));
     }
 
     @Test
-    public void testCalculateConsumedElectricityInIntervalCumulative() {
-        List<ObservedValue> list = new ArrayList<>();
-        LocalDateTime time = LocalDateTime.now();
-        list.add(new ObservedValue(time.minusDays(4),1.3));
-        list.add(new ObservedValue(time.minusDays(2),2.6));
-        list.add(new ObservedValue(time,5.5));
-        list.add(new ObservedValue(time.plusDays(1),12.0));
-        list.add(new ObservedValue(time.plusDays(4),18.6));
-        list.add(new ObservedValue(time.plusDays(9),22.6));
-        list.add(new ObservedValue(time.plusMonths(2),33.6));   
-        Meter meter = new Meter(null, new Distribution("Cez", "Praha"), Meter.MeterType.CUMULATIVE_VALUE, list);
-        
-        double totalConsumedPower = meter.calculateConsumedElectricity(time.minusDays(3), time.plusDays(5));
-        assertEquals(16.0, totalConsumedPower);
+    public void testCalculateConsumedPowerCumulativeInInterval() {
+        Meter meter = createMeterWithValues(null, Meter.MeterType.CUMULATIVE_VALUE);
+        //(80 - 70.5) + (100.5 - 80) + (150 - 100.5) = 79.5
+        assertEquals(79.5, meter.calculateConsumedPower(currentTime.minusDays(3), currentTime.plusDays(5)));
     }
 
     @Test
-    public void testCalculateConsumedElectricityInIntervalEmpty() {
-        List<ObservedValue> list = new ArrayList<>();
-        LocalDateTime time = LocalDateTime.now();
-        Meter meter = new Meter(null, new Distribution("Cez", "Praha"), Meter.MeterType.ACTUAL_VALUE, list);
-
-        double totalConsumedPower = meter.calculateConsumedElectricity(time.minusDays(3), time.plusDays(5));
-        assertEquals(0.0, totalConsumedPower);
+    public void testCalculateConsumedPowerCumulativeValuesIsEmpty() {
+        Meter meter = createMeterWithCustomValues(null, Meter.MeterType.CUMULATIVE_VALUE, new ArrayList<>());
+        assertEquals(0.0, meter.calculateConsumedPower());
     }
 
     @Test
-    public void testCalculateConsumedElectricityInIntervalNull() {
-        LocalDateTime time = LocalDateTime.now();
-        Meter meter = new Meter(null, new Distribution("Cez", "Praha"), Meter.MeterType.ACTUAL_VALUE, null);
-        double totalConsumedPower = meter.calculateConsumedElectricity(time.minusDays(3), time.plusDays(5));
-        assertEquals(0.0, totalConsumedPower);
+    public void testCalculateConsumedPowerCumulativeValuesIsNull() {
+        Meter meter = createMeterWithCustomValues(null, Meter.MeterType.CUMULATIVE_VALUE, null);
+        assertEquals(0.0, meter.calculateConsumedPower());
     }
 
     @Test
-    public void testCalculateConsumedElectricityInIntervalCumulativeChangedMeter() {
-        List<ObservedValue> list = new ArrayList<>();
-        LocalDateTime time = LocalDateTime.now();
-        list.add(new ObservedValue(time.minusDays(4), 1.3));
-        list.add(new ObservedValue(time.minusDays(2), 2.6));
-        list.add(new ObservedValue(time, 5.5));
-
-        ObservedValue observedWithFirstNewMeter = new ObservedValue(time.plusDays(1), 12.0);
-        observedWithFirstNewMeter.getTagsAndFlags().add(new ObservedTagsAndFlags.MeterReplacedJustAfterMeasurementTag(
-                "T1", 40.0));
-        list.add(observedWithFirstNewMeter);
-
-        list.add(new ObservedValue(time.plusDays(1), 52.0));
-        list.add(new ObservedValue(time.plusDays(4), 58.6));
-
-        ObservedValue observedWithSecondNewMeter = new ObservedValue(time.plusDays(9), 62.6);
-        observedWithSecondNewMeter.getTagsAndFlags().add(new ObservedTagsAndFlags.MeterReplacedJustAfterMeasurementTag(
-                "T2", 20.0));
-        list.add(observedWithSecondNewMeter);
-        list.add(new ObservedValue(time.plusDays(10),28.6));
-        list.add(new ObservedValue(time.plusMonths(2),33.6));   
-        Meter meter = new Meter(null, new Distribution("Cez", "Praha"), Meter.MeterType.CUMULATIVE_VALUE, list);
-        
-        double totalConsumedPower = meter.calculateConsumedElectricity(time.minusDays(3), time.plusDays(10));
-        assertEquals(40.6, totalConsumedPower);
+    public void testCalculateConsumedPowerActualInIntervalValuesIsEmpty() {
+        Meter meter = createMeterWithCustomValues(null, Meter.MeterType.ACTUAL_VALUE, new ArrayList<>());
+        assertEquals(0.0, meter.calculateConsumedPower(currentTime.minusDays(3), currentTime.plusDays(5)));
     }
 
     @Test
-    public void testCalculateConsumedElectricityNull() {
-        Meter meter = new Meter(null, null, Meter.MeterType.CUMULATIVE_VALUE, null);
-
-        double consumedPower = meter.calculateConsumedElectricity();
-        assertEquals(0, consumedPower);
+    public void testCalculateConsumedPowerActualInIntervalValuesIsNull() {
+        Meter meter = createMeterWithCustomValues(null, Meter.MeterType.ACTUAL_VALUE, null);
+        assertEquals(0.0, meter.calculateConsumedPower(currentTime.minusDays(3), currentTime.plusDays(5)));
     }
 
     @Test
-    public void testCalculateConsumedElectricityEmpty() {
+    public void testCalculateConsumedPowerCumulativeInIntervalChangedMeter() {
+        List<ObservedValue> observedValues = new ArrayList<>(List.of(new ObservedValue(currentTime.minusDays(4), 1.0),
+                                                                     new ObservedValue(currentTime.minusDays(2), 2.5),
+                                                                     new ObservedValue(currentTime, 5.5)));
+
+        ObservedValue observedWithFirstNewMeter = new ObservedValue(currentTime.plusDays(1), 12.0);
+        observedWithFirstNewMeter.getTagsAndFlags().add(new ObservedTagsAndFlags.MeterReplacedJustAfterMeasurementTag("M1", 40.0));
+        observedValues.add(observedWithFirstNewMeter);
+
+        observedValues.add(new ObservedValue(currentTime.plusDays(2), 50.0));
+        observedValues.add(new ObservedValue(currentTime.plusDays(4), 60.5));
+
+        ObservedValue observedWithSecondNewMeter = new ObservedValue(currentTime.plusDays(9), 60.5);
+        observedWithSecondNewMeter.getTagsAndFlags().add(new ObservedTagsAndFlags.MeterReplacedJustAfterMeasurementTag("M2", 20.0));
+        observedValues.add(observedWithSecondNewMeter);
+
+        observedValues.add(new ObservedValue(currentTime.plusDays(10), 30.5));
+        observedValues.add(new ObservedValue(currentTime.plusMonths(2), 30.5));
+
+        Meter meter = createMeterWithCustomValues(null, Meter.MeterType.CUMULATIVE_VALUE, observedValues);
+        //(5,5 - 2,5) + (12 - 5,5) + (50 - 40) + (60,5 - 50) + (30,5 - 20) = 40.5
+        assertEquals(40.5, meter.calculateConsumedPower(currentTime.minusDays(3), currentTime.plusDays(10)));
+    }
+
+    @Test
+    public void testCalculateConsumedPowerCumulativeSameTimeOfObservedValues() {
+        List<ObservedValue> observedValues = new ArrayList<>(List.of(new ObservedValue(currentTime, 100.0),
+                                                                     new ObservedValue(currentTime.plusDays(1), 150.0),
+                                                                     new ObservedValue(currentTime.plusDays(1), 210.0)));
+
+        Meter meter = createMeterWithCustomValues(null, Meter.MeterType.CUMULATIVE_VALUE, observedValues);
+        //210 - 100 = 110
+        assertEquals(110, meter.calculateConsumedPower());
+    }
+
+    @Test
+    public void testCalculateConsumedPowerCumulativeWithMeterChange() {
         List<ObservedValue> observedValues = new ArrayList<>();
-        Meter meter = new Meter(null, null, Meter.MeterType.CUMULATIVE_VALUE, observedValues);
 
-        double consumedPower = meter.calculateConsumedElectricity();
-        assertEquals(0, consumedPower);
+        observedValues.add(new ObservedValue(currentTime, 100.0));
+
+        ObservedValue observedValue = new ObservedValue(currentTime.plusDays(1), 150.0);
+        ObservedTagsAndFlags tagAndFlag = new ObservedTagsAndFlags.MeterReplacedJustAfterMeasurementTag("M1", 50.0);
+        observedValue.getTagsAndFlags().add(tagAndFlag);
+
+        observedValues.add(observedValue);
+        observedValues.add(new ObservedValue(currentTime.plusDays(2), 110.0));
+
+        Meter meter = createMeterWithCustomValues(null, Meter.MeterType.CUMULATIVE_VALUE, observedValues);
+        //(150 - 100) + (110 - 50) = 110
+        assertEquals(110, meter.calculateConsumedPower());
     }
 
     @Test
-    public void testCalculateConsumedElectricityCumulative() {
-        LocalDateTime time1 = LocalDateTime.now();
-        LocalDateTime time2 = time1.plusHours(1);
+    public void testCalculateConsumedPowerCumulativeWithMultipleMeterChange() {
         List<ObservedValue> observedValues = new ArrayList<>();
-        observedValues.add(new ObservedValue(time1, 100.0));
-        observedValues.add(new ObservedValue(time2, 150.0));
-        observedValues.add(new ObservedValue(time2, 210.0));
-        Meter meter = new Meter(null, null, Meter.MeterType.CUMULATIVE_VALUE, observedValues);
-        
-        double consumedPower = meter.calculateConsumedElectricity();
-        assertEquals(110, consumedPower);
+        ObservedValue observedValue;
+        ObservedTagsAndFlags tagAndFlag;
+
+        observedValues.add(new ObservedValue(currentTime, 100.0));
+
+        observedValue = new ObservedValue(currentTime.plusHours(1), 150.0);
+        tagAndFlag = new ObservedTagsAndFlags.MeterReplacedJustAfterMeasurementTag("M1", 50.0);
+        observedValue.getTagsAndFlags().add(tagAndFlag);
+
+        observedValues.add(observedValue);
+        observedValues.add(new ObservedValue(currentTime.plusHours(2), 150.0));
+
+        observedValue = new ObservedValue(currentTime.plusHours(3), 170.0);
+        tagAndFlag = new ObservedTagsAndFlags.MeterReplacedJustAfterMeasurementTag("M2", 10.0);
+        observedValue.getTagsAndFlags().add(tagAndFlag);
+
+        observedValues.add(observedValue);
+        observedValues.add(new ObservedValue(currentTime.plusHours(4), 30.0));
+
+        Meter meter = createMeterWithCustomValues(null, Meter.MeterType.CUMULATIVE_VALUE, observedValues);
+        //(150 - 100) + (170 - 50) + (30 - 10) = 190
+        assertEquals(190, meter.calculateConsumedPower());
     }
 
     @Test
-    public void testCalculateConsumedElectricityWithMeterChange() {
-        LocalDateTime time1 = LocalDateTime.now();
-        LocalDateTime time2 = time1.plusHours(1);
-        LocalDateTime time3 = time2.plusHours(1);
-
-        List<ObservedValue> observedValues = new ArrayList<>();
-        observedValues.add(new ObservedValue(time1, 100.0));
-
-        ObservedValue observerWithMeterChange = new ObservedValue(time2, 150.0);
-        observerWithMeterChange.getTagsAndFlags().add(new ObservedTagsAndFlags.MeterReplacedJustAfterMeasurementTag(
-                "newMeterId", 50.0));
-        observedValues.add(observerWithMeterChange);
-
-        observedValues.add(new ObservedValue(time3, 110.0));
-
-        Meter meter = new Meter(null, null, Meter.MeterType.CUMULATIVE_VALUE, observedValues);
-        double consumedPower = meter.calculateConsumedElectricity();
-
-        // The expected result should be 150 - 100 + 110 - 50 = 110
-        assertEquals(110, consumedPower);
+    public void testCalculateConsumedPowerActual() {
+        Meter meter = createMeterWithValues(null, Meter.MeterType.ACTUAL_VALUE);
+        //50 + 70.5 + 80 + 100.5 + 150 + 200.5 + 500 = 1151.5
+        assertEquals(1151.5, meter.calculateConsumedPower());
     }
 
     @Test
-    public void testCalculateConsumedElectricityWithMultipleMeterChange() {
-        LocalDateTime time = LocalDateTime.now();
-
-        List<ObservedValue> observedValues = new ArrayList<>();
-        observedValues.add(new ObservedValue(time, 100.0));
-
-        ObservedValue observerWithMeterChange1 = new ObservedValue(time.plusHours(1), 150.0);
-        observerWithMeterChange1.getTagsAndFlags().add(new ObservedTagsAndFlags.MeterReplacedJustAfterMeasurementTag(
-                "newMeterId1", 50.0));
-        observedValues.add(observerWithMeterChange1);
-
-        observedValues.add(new ObservedValue(time.plusHours(2), 110.0));
-        observedValues.add(new ObservedValue(time.plusHours(2), 150.0));
-
-        ObservedValue observerWithMeterChange2 = new ObservedValue(time.plusHours(3), 170.0);
-        observerWithMeterChange2.getTagsAndFlags().add(new ObservedTagsAndFlags.MeterReplacedJustAfterMeasurementTag(
-                "newMeterId2", 10.0));
-        observedValues.add(observerWithMeterChange2);
-
-        observedValues.add(new ObservedValue(time.plusHours(4), 30.0));
-
-
-        Meter meter = new Meter(null, null, Meter.MeterType.CUMULATIVE_VALUE, observedValues);
-        double consumedPower = meter.calculateConsumedElectricity();
-
-        // The expected result should be 150 - 100 + 170 - 50 + 30 - 10 = 190
-        assertEquals(190, consumedPower);
+    public void testCalculateElectricityPriceCumulativeWithUnitPrice() {
+        Meter meter = createMeterWithValues(new Energy(Energy.EnergyType.ELECTRICITY, 10.0), Meter.MeterType.CUMULATIVE_VALUE);
+        //(20.5 * 10) + (10.5 * 10) + ... + (299.5 * 10) = 4500
+        assertEquals(4500.0, meter.calculatePrice());
     }
 
     @Test
-    public void testCalculateConsumedElectricityActual() {
-        LocalDateTime time1 = LocalDateTime.now();
-        LocalDateTime time2 = time1.plusHours(1);
-        LocalDateTime time3 = time2.plusHours(1);
-        List<ObservedValue> observedValues = new ArrayList<>();
-        observedValues.add(new ObservedValue(time1, 10.0));
-        observedValues.add(new ObservedValue(time2, 20.0));
-        observedValues.add(new ObservedValue(time3, 30.0));
-        Meter meter = new Meter(null, null, Meter.MeterType.ACTUAL_VALUE,observedValues);
-
-        double consumedPower = meter.calculateConsumedElectricity();
-        assertEquals(60.0, consumedPower);
+    public void testCalculateGasPriceActualWithUnitPrice() {
+        Meter meter = createMeterWithValues(new Energy(Energy.EnergyType.GAS, 20.0), Meter.MeterType.ACTUAL_VALUE);
+        //(50 * 20) + (70.5 * 20) + ... + (500 * 20) = 23030
+        assertEquals(23030.0, meter.calculatePrice());
     }
 
     @Test
-    public void testCalculatePriceWithCumulativeMeter() {
-        Energy energy = new Energy(Energy.EnergyType.ELECTRICITY);
-        energy.setPricePerMeasuredUnit(10.0);
+    public void testCalculateHotWaterPriceCumulativeWithPriceChange() {
+        ObservedValue changedValue = new ObservedValue(currentTime.plusHours(5), 300);
+        ObservedTagsAndFlags changedPrice = new ObservedTagsAndFlags.UnitPriceChangedJustAfterMeasurementTag(10.0);
+        changedValue.getTagsAndFlags().add(changedPrice);
 
-        List<ObservedValue> observedValues = new ArrayList<>();
-        observedValues.add(new ObservedValue(LocalDateTime.now(), 100.0));
-        observedValues.add(new ObservedValue(LocalDateTime.now().plusHours(1), 120.0));
-        observedValues.add(new ObservedValue(LocalDateTime.now().plusHours(2), 180.0));
+        List<ObservedValue> observedValues = new ArrayList<>(List.of(new ObservedValue(currentTime, 200),
+                                                                     changedValue,
+                                                                     new ObservedValue(currentTime.plusHours(8), 350)));
 
-        Meter meter = new Meter(energy, null, Meter.MeterType.CUMULATIVE_VALUE, observedValues);
-        
-        double expectedPrice = 800.0;
-        assertEquals(expectedPrice, meter.calculatePrice());
+        Meter meter = createMeterWithCustomValues(new Energy(Energy.EnergyType.HOT_WATER, 5.0), Meter.MeterType.CUMULATIVE_VALUE, observedValues);
+        //((300 - 200) * 5) + ((350 - 300) * 10) = 1000
+        assertEquals(1000.0, meter.calculatePrice());
     }
 
     @Test
-    public void testCalculatePriceWithActualMeter() {
-        Energy energy = new Energy(Energy.EnergyType.GAS);
-        energy.setPricePerMeasuredUnit(20.0);
+    public void testCalculateHotWaterPriceCumulativeWithPriceAndMeterChange() {
+        ObservedValue changedValue = new ObservedValue(currentTime.plusHours(5), 300);
+        ObservedTagsAndFlags changedPrice = new ObservedTagsAndFlags.UnitPriceChangedJustAfterMeasurementTag(10.0);
+        ObservedTagsAndFlags changedMeter = new ObservedTagsAndFlags.MeterReplacedJustAfterMeasurementTag("M1", 50);
+        changedValue.getTagsAndFlags().add(changedPrice);
+        changedValue.getTagsAndFlags().add(changedMeter);
 
-        List<ObservedValue> observedValues = new ArrayList<>();
-        observedValues.add(new ObservedValue(LocalDateTime.now(), 50.0));
-        observedValues.add(new ObservedValue(LocalDateTime.now().plusHours(1), 80.0));
-        observedValues.add(new ObservedValue(LocalDateTime.now().plusHours(2), 100.0));
+        List<ObservedValue> observedValues = new ArrayList<>(List.of(new ObservedValue(currentTime, 200),
+                                                                     changedValue,
+                                                                     new ObservedValue(currentTime.plusHours(8), 150)));
 
-        Meter meter = new Meter(energy, null, Meter.MeterType.ACTUAL_VALUE, observedValues);
-
-        double expectedPrice = 4600.0;
-        assertEquals(expectedPrice, meter.calculatePrice());
+        Meter meter = createMeterWithCustomValues(new Energy(Energy.EnergyType.HOT_WATER, 5.0), Meter.MeterType.CUMULATIVE_VALUE, observedValues);
+        //((300 - 200) * 5) + ((150 - 50) * 10) = 1500
+        assertEquals(1500.0, meter.calculatePrice());
     }
 
     @Test
-    public void testCalculatePriceWithPriceChange() {
-        Energy energy = new Energy(Energy.EnergyType.HOT_WATER);
-        energy.setPricePerMeasuredUnit(5.0);
-
-        List<ObservedValue> observedValues = new ArrayList<>();
-        ObservedValue value1 = new ObservedValue(LocalDateTime.now(), 200);
-        ObservedValue value2 = new ObservedValue(LocalDateTime.now().plusHours(5), 300);
-        ObservedValue value3 = new ObservedValue(LocalDateTime.now().plusHours(8), 350);
-
-        ObservedTagsAndFlags priceChange = new ObservedTagsAndFlags.UnitPriceChangedJustAfterMeasurementTag(10.0);
-        value2.getTagsAndFlags().add(priceChange);
-
-        observedValues.add(value1);
-        observedValues.add(value2);
-        observedValues.add(value3);
-
-        Meter meter = new Meter(energy, null, Meter.MeterType.CUMULATIVE_VALUE, observedValues);
-        
-        double expectedPrice = 1000.0;
-        assertEquals(expectedPrice, meter.calculatePrice());
+    public void testCalculateElectricityPriceCumulativeInInterval() {
+        Meter meter = createMeterWithValues(new Energy(Energy.EnergyType.ELECTRICITY, 10.0), Meter.MeterType.CUMULATIVE_VALUE);
+        //(150 - 100.5) * 10 = 495
+        assertEquals(495.0, meter.calculatePrice(currentTime.plusDays(1), currentTime.plusDays(5)));
     }
 
     @Test
-    public void testCalculatePriceWithPriceAndMeterChange() {
-        Energy energy = new Energy(Energy.EnergyType.HOT_WATER);
-        energy.setPricePerMeasuredUnit(5.0);
-
-        List<ObservedValue> observedValues = new ArrayList<>();
-        ObservedValue value1 = new ObservedValue(LocalDateTime.now(), 200);
-        ObservedValue value2 = new ObservedValue(LocalDateTime.now().plusHours(5), 300);
-        ObservedValue value3 = new ObservedValue(LocalDateTime.now().plusHours(8), 150);
-
-        ObservedTagsAndFlags priceChange = new ObservedTagsAndFlags.UnitPriceChangedJustAfterMeasurementTag(10.0);
-        ObservedTagsAndFlags meterChange = new ObservedTagsAndFlags.MeterReplacedJustAfterMeasurementTag("ID007", 50);
-        value2.getTagsAndFlags().add(priceChange);
-        value2.getTagsAndFlags().add(meterChange);
-
-        observedValues.add(value1);
-        observedValues.add(value2);
-        observedValues.add(value3);
-
-        Meter meter = new Meter(energy, null, Meter.MeterType.CUMULATIVE_VALUE, observedValues);
-        
-        double expectedPrice = 1500.0;
-        assertEquals(expectedPrice, meter.calculatePrice());
+    public void testCalculateElectricityPriceCumulativeFromDate() {
+        Meter meter = createMeterWithValues(new Energy(Energy.EnergyType.ELECTRICITY, 10.0), Meter.MeterType.CUMULATIVE_VALUE);
+        //(500 - 200.5) * 10 = 2995
+        assertEquals(2995.0, meter.calculatePrice(currentTime.plusDays(5), null));
     }
 
     @Test
-    public void testCalculatePriceWithCumulativeMeterInInterval() {
-        Energy energy = new Energy(Energy.EnergyType.ELECTRICITY);
-        energy.setPricePerMeasuredUnit(10.0);
-
-        LocalDateTime valuesFrom = LocalDateTime.now();
-        LocalDateTime from = valuesFrom.plusHours(1);
-        LocalDateTime to = valuesFrom.plusHours(2);
-
-        List<ObservedValue> observedValues = new ArrayList<>();
-        observedValues.add(new ObservedValue(valuesFrom, 100.0));
-        observedValues.add(new ObservedValue(valuesFrom.plusHours(1), 120.0));
-        observedValues.add(new ObservedValue(valuesFrom.plusHours(2), 180.0));
-        observedValues.add(new ObservedValue(valuesFrom.plusHours(3), 280.0));
-
-        Meter meter = new Meter(energy, null, Meter.MeterType.CUMULATIVE_VALUE, observedValues);
-
-        double expectedPrice = 600.0;
-        assertEquals(expectedPrice, meter.calculatePrice(from, to));
+    public void testCalculateElectricityPriceCumulativeToDate() {
+        Meter meter = createMeterWithValues(new Energy(Energy.EnergyType.ELECTRICITY, 10.0), Meter.MeterType.CUMULATIVE_VALUE);
+        //((70,5 - 50) * 10) + ((80 - 70,5) * 10) = 1000
+        assertEquals(300.0, meter.calculatePrice(null, currentTime));
     }
 
-    @Test
-    public void testCalculatePriceWithCumulativeMeterFromDate() {
-        Energy energy = new Energy(Energy.EnergyType.ELECTRICITY);
-        energy.setPricePerMeasuredUnit(10.0);
-
-        LocalDateTime valuesFrom = LocalDateTime.now();
-        LocalDateTime from = valuesFrom.plusHours(1);
-
-        List<ObservedValue> observedValues = new ArrayList<>();
-        observedValues.add(new ObservedValue(valuesFrom, 100.0));
-        observedValues.add(new ObservedValue(valuesFrom.plusHours(1), 120.0));
-        observedValues.add(new ObservedValue(valuesFrom.plusHours(2), 180.0));
-        observedValues.add(new ObservedValue(valuesFrom.plusHours(3), 280.0));
-
-        Meter meter = new Meter(energy, null, Meter.MeterType.CUMULATIVE_VALUE, observedValues);
-
-        double expectedPrice = 1600.0;
-        assertEquals(expectedPrice, meter.calculatePrice(from, null));
-    }
-
-    @Test
-    public void testCalculatePriceWithCumulativeMeterToDate() {
-        Energy energy = new Energy(Energy.EnergyType.ELECTRICITY);
-        energy.setPricePerMeasuredUnit(10.0);
-
-        LocalDateTime valuesFrom = LocalDateTime.now();
-        LocalDateTime to = valuesFrom.plusHours(1);
-
-        List<ObservedValue> observedValues = new ArrayList<>();
-        observedValues.add(new ObservedValue(valuesFrom, 100.0));
-        observedValues.add(new ObservedValue(valuesFrom.plusHours(1), 120.0));
-        observedValues.add(new ObservedValue(valuesFrom.plusHours(2), 180.0));
-        observedValues.add(new ObservedValue(valuesFrom.plusHours(3), 280.0));
-
-        Meter meter = new Meter(energy, null, Meter.MeterType.CUMULATIVE_VALUE, observedValues);
-
-        double expectedPrice = 200.0;
-        assertEquals(expectedPrice, meter.calculatePrice(null, to));
-    }
-    
 }

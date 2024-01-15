@@ -73,21 +73,21 @@ public class Meter {
     }
 
     /**
-     * Calculate consumed electrics by selected MeterType.
+     * Calculate consumed power by selected MeterType.
      *
      * @return total consumed power
      */
-    public double calculateConsumedElectricity() {
-        return calculateConsumedElectricity(null, null);
+    public double calculateConsumedPower() {
+        return calculateConsumedPower(null, null);
     }
 
-    public double calculateConsumedElectricity(LocalDateTime from, LocalDateTime to) {
+    public double calculateConsumedPower(LocalDateTime from, LocalDateTime to) {
         //Calculate consumed power from selected measurements
         if (isObservedValuesEmpty()) {
             return 0.0;
         }
 
-        double totalConsumedElectricity = 0.0;
+        double totalConsumedPower = 0.0;
         double previousValue = 0.0;
         List<ObservedValue> observedValuesInTimeInterval = getObservedValuesInTimeInterval(from, to);
 
@@ -96,18 +96,18 @@ public class Meter {
 
             if (meterType == MeterType.CUMULATIVE_VALUE) {
                 if (previousValue != 0.0) {
-                    totalConsumedElectricity += observedValue.getValue() - previousValue;
+                    totalConsumedPower += observedValue.getValue() - previousValue;
                 }
                 previousValue = observedValue.getValue();
                 if (observedValue.getNewMeterStartValueIfReplaced() != null) {
                     previousValue = observedValue.getNewMeterStartValueIfReplaced();
                 }
             } else {
-                totalConsumedElectricity += observedValue.getValue();
+                totalConsumedPower += observedValue.getValue();
             }
         }
 
-        return totalConsumedElectricity;
+        return totalConsumedPower;
     }
 
     public double calculatePrice() {
