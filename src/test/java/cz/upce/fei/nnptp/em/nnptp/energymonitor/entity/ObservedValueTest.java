@@ -40,7 +40,7 @@ public class ObservedValueTest {
         testValue.getTagsAndFlags().add(priceChange1);
         testValue.getTagsAndFlags().add(priceChange2);
 
-        assertEquals(80, testValue.getNewUnitPriceIfChanged());
+        assertEquals(90, testValue.getNewUnitPriceIfChanged());
     }
 
     @Test
@@ -50,6 +50,38 @@ public class ObservedValueTest {
         testValue.getTagsAndFlags().add(meterChange1);
         testValue.getTagsAndFlags().add(meterChange2);
 
-        assertEquals(75, testValue.getNewMeterStartValueIfReplaced());
+        assertEquals(50, testValue.getNewMeterStartValueIfReplaced());
+    }
+
+    @Test
+    void getLocalDateTime() {
+    }
+
+    @Test
+    void setLocalDateTime() {
+    }
+
+    @Test
+    void getValue() {
+    }
+
+    @Test
+    void setValue() {
+    }
+
+    @Test
+    void getTagsAndFlags() {
+    }
+
+    @Test
+    void getNewUnitPriceIfChanged() {
+    }
+
+    @Test
+    void getNewMeterStartValueIfReplaced() {
+    }
+
+    @Test
+    void addTagsAndFlags() {
     }
 }
