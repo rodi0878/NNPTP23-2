@@ -121,7 +121,7 @@ public class Meter {
 
         double currentUnitPrice = energy.getPricePerMeasuredUnit();
         double totalPrice = 0.0;
-        double lastValue = 0.0;
+        double lastObservedValue = 0.0;
 
         List<ObservedValue> observedValuesInTimeInterval = getObservedValuesInTimeInterval(from, to);
 
@@ -131,11 +131,11 @@ public class Meter {
 
             if (meterType == MeterType.CUMULATIVE_VALUE) {
                 if (i == 0) {
-                    lastValue = observedValue.getValue();
+                    lastObservedValue = observedValue.getValue();
                     continue;
                 }
-                consumedElectricity = observedValue.getValue() - lastValue;
-                lastValue = observedValue.getValue();
+                consumedElectricity = observedValue.getValue() - lastObservedValue;
+                lastObservedValue = observedValue.getValue();
             }
 
             totalPrice += consumedElectricity * currentUnitPrice;
@@ -144,7 +144,7 @@ public class Meter {
                 currentUnitPrice = observedValue.getNewUnitPriceIfChanged();
             }
             if (observedValue.getNewMeterStartValueIfReplaced() != null) {
-                lastValue = observedValue.getNewMeterStartValueIfReplaced();
+                lastObservedValue = observedValue.getNewMeterStartValueIfReplaced();
             }
         }
         return totalPrice;
