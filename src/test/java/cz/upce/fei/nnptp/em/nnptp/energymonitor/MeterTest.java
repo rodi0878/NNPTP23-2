@@ -150,6 +150,34 @@ public class MeterTest {
     }
 
     @Test
+    public void testCalculateConsumedElectricityCumulativeWithMultipleUnitPriceChange() {
+        List<ObservedValue> observedValues = new ArrayList<>();
+        ObservedValue observedValue;
+        ObservedTagsAndFlags tagAndFlag;
+
+        observedValues.add(new ObservedValue(currentTime, 100.0));
+
+        observedValue = new ObservedValue(currentTime.plusHours(1), 150.0);
+        tagAndFlag = new ObservedTagsAndFlags.UnitPriceChangedJustAfterMeasurementTag(50.0);
+        observedValue.getTagsAndFlags().add(tagAndFlag);
+
+        observedValues.add(observedValue);
+        observedValues.add(new ObservedValue(currentTime.plusHours(2), 160.0));
+
+        observedValue = new ObservedValue(currentTime.plusHours(3), 170.0);
+        tagAndFlag = new ObservedTagsAndFlags.UnitPriceChangedJustAfterMeasurementTag(10.0);
+        observedValue.getTagsAndFlags().add(tagAndFlag);
+
+        observedValues.add(observedValue);
+        observedValues.add(new ObservedValue(currentTime.plusHours(4), 200.0));
+
+        Meter meter = createMeterWithCustomValues(new Energy(Energy.EnergyType.ELECTRICITY, 10), Meter.MeterType.CUMULATIVE_VALUE, observedValues);
+        // (150-100)*10 + (160-150)*50 + (170-160)*50 + (200-170)*10 = 1800
+
+        assertEquals(1800, meter.calculatePrice());
+    }
+
+    @Test
     public void testCalculateConsumedPowerActual() {
         Meter meter = createMeterWithValues(null, Meter.MeterType.ACTUAL_VALUE);
         //50 + 70.5 + 80 + 100.5 + 150 + 200.5 + 500 = 1151.5
